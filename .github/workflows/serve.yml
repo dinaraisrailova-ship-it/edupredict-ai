@@ -2,14 +2,15 @@ name: EduPredict AI - 24/7 Server
 
 on:
   schedule:
-    - cron: '0 */5 * * *'   # Har 5 soatda qayta ishga tushadi
-  workflow_dispatch:          # Qo'lda ham ishga tushirish mumkin
+    - cron: '0 */5 * * *'
+  workflow_dispatch:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
 
 permissions:
   contents: write
-  pages: write
 
 jobs:
   serve:
@@ -17,91 +18,92 @@ jobs:
     timeout-minutes: 350
 
     steps:
-      - name: Repo yuklab olish
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Python sozlash
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           cache: 'pip'
 
-      - name: Paketlar o'rnatish
+      - name: Install packages
         run: |
-          pip install --upgrade pip
-          pip install streamlit pandas numpy scikit-learn xgboost lightgbm \
-                      matplotlib seaborn imbalanced-learn joblib ucimlrepo \
-                      shap plotly scipy huggingface_hub
+          pip install -q streamlit pandas numpy scikit-learn xgboost lightgbm \
+            matplotlib seaborn imbalanced-learn joblib ucimlrepo shap plotly scipy
           echo "MPLBACKEND=Agg" >> $GITHUB_ENV
 
-      - name: Cloudflared yuklab olish
+      - name: Download cloudflared
         run: |
           wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
           chmod +x cloudflared
 
-      - name: Streamlit ishga tushirish
+      - name: Start Streamlit
         run: |
           nohup streamlit run app.py \
             --server.port 8502 \
             --server.headless true \
             --server.enableCORS false \
-            --server.enableXsrfProtection false \
-            --server.address 0.0.0.0 > streamlit.log 2>&1 &
-          echo "Streamlit ishga tushdi"
+            --server.enableXsrfProtection false > /tmp/streamlit.log 2>&1 &
           sleep 20
+          echo "Streamlit started"
 
-      - name: Tunnel ishga tushirish va URL olish
+      - name: Start tunnel and get URL
         run: |
-          nohup ./cloudflared tunnel --protocol http2 --url http://localhost:8502 > tunnel.log 2>&1 &
+          nohup ./cloudflared tunnel --protocol http2 --url http://localhost:8502 > /tmp/tunnel.log 2>&1 &
           sleep 25
-          URL=$(grep -o 'https://[^[:space:]]*\.trycloudflare\.com' tunnel.log | head -1)
-          echo "TUNNEL_URL=$URL" >> $GITHUB_ENV
-          echo "URL: $URL"
+          TUNNEL_URL=$(grep -o 'https://[^ ]*\.trycloudflare\.com' /tmp/tunnel.log | head -1)
+          echo "TUNNEL_URL=$TUNNEL_URL" >> $GITHUB_ENV
+          echo "Got URL: $TUNNEL_URL"
 
-      - name: GitHub Pages yangilash
+      - name: Update GitHub Pages
         run: |
-          URL=${{ env.TUNNEL_URL }}
-          cat > docs/index.html << HTMLEOF
-          <!DOCTYPE html>
-          <html lang="uz">
-          <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>EduPredict AI - 24/7 Online</title>
-          <meta http-equiv="refresh" content="2;url=$URL">
-          <style>
-          *{margin:0;padding:0;box-sizing:border-box}
-          body{background:#010610;color:#E2E8F0;font-family:'Courier New',monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}
-          h1{color:#00D4FF;font-size:2.5rem;text-shadow:0 0 20px #00D4FF;margin-bottom:15px}
-          p{color:#94A3B8;margin-bottom:25px;font-size:1.1rem}
-          .btn{display:inline-block;padding:18px 45px;background:linear-gradient(135deg,#00D4FF,#7C3AED);color:white;text-decoration:none;border-radius:8px;font-size:1.3rem;font-weight:bold;animation:glow 2s ease-in-out infinite alternate}
-          @keyframes glow{from{box-shadow:0 0 10px #00D4FF}to{box-shadow:0 0 30px #7C3AED,0 0 60px #00D4FF}}
-          .on{margin-top:15px;color:#22C55E;font-size:1rem}
-          .url{margin-top:15px;color:#00D4FF;font-size:.85rem;word-break:break-all}
-          </style>
-          </head>
-          <body>
-          <div>
-          <h1>EduPredict AI</h1>
-          <p>AI bilan talabalar tahlili<br>2 soniyada ochilmoqda...</p>
-          <a class="btn" href="$URL">Ilovani Ochish</a>
-          <div class="on">ONLINE 24/7</div>
-          <div class="url">$URL</div>
-          </div>
-          <script>setTimeout(()=>location.href="$URL",2000)</script>
-          </body>
-          </html>
-          HTMLEOF
-
+          TUNNEL_URL="${{ env.TUNNEL_URL }}"
+          python3 - << 'PYEOF'
+import os
+url = os.environ.get('TUNNEL_URL', '')
+html = f"""<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPredict AI</title>
+<meta http-equiv="refresh" content="2;url={url}">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{background:#010610;color:#E2E8F0;font-family:'Courier New',monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}}
+h1{{color:#00D4FF;font-size:2.5rem;text-shadow:0 0 20px #00D4FF;margin-bottom:15px}}
+p{{color:#94A3B8;margin-bottom:25px;font-size:1.1rem}}
+.btn{{display:inline-block;padding:18px 45px;background:linear-gradient(135deg,#00D4FF,#7C3AED);color:white;text-decoration:none;border-radius:8px;font-size:1.3rem;font-weight:bold;animation:glow 2s ease-in-out infinite alternate}}
+@keyframes glow{{from{{box-shadow:0 0 10px #00D4FF}}to{{box-shadow:0 0 30px #7C3AED,0 0 60px #00D4FF}}}}
+.on{{margin-top:15px;color:#22C55E;font-size:1rem}}
+.url{{margin-top:15px;color:#00D4FF;font-size:.85rem;word-break:break-all}}
+</style>
+</head>
+<body>
+<div>
+<h1>EduPredict AI</h1>
+<p>AI bilan talabalar tahlili<br>2 soniyada ochilmoqda...</p>
+<a class="btn" href="{url}">Ilovani Ochish</a>
+<div class="on">ONLINE 24/7</div>
+<div class="url">{url}</div>
+</div>
+<script>setTimeout(()=>location.href="{url}",2000)</script>
+</body>
+</html>"""
+os.makedirs('docs', exist_ok=True)
+open('docs/index.html', 'w', encoding='utf-8').write(html)
+print(f"HTML yozildi: {url}")
+PYEOF
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
+          git pull --rebase origin main
           git add docs/index.html
-          git commit -m "Live: $URL [skip ci]" || echo "O'zgarish yo'q"
-          git push
+          git diff --staged --quiet || git commit -m "Live: $TUNNEL_URL [skip ci]"
+          git push origin main
 
-      - name: Server ishlayapti - 5 soat kutish
+      - name: Keep alive 5h 30min
         run: |
-          echo "Server ishlayapti: ${{ env.TUNNEL_URL }}"
-          echo "5 soat 30 daqiqa ishlaydi..."
-          sleep 18000
-          echo "Ish tugadi, yangi sessiya boshlanadi"
+          echo "Server running: ${{ env.TUNNEL_URL }}"
+          echo "Will restart in 5.5 hours..."
+          sleep 19800
