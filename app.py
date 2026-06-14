@@ -814,7 +814,7 @@ elif "Data Explorer" in page or "Ma'lumotlar" in page:
             apply_dark(fig2, title=f"{col_sel} — Boxplot", height=340)
             st.plotly_chart(fig2, use_container_width=True, key="eda_box")
         except Exception as e:
-            st.error(f"Chart xatosi: {e}")
+            st.error(f"Chart error: {e}")
 
     with t3:
         try:
@@ -844,7 +844,7 @@ elif "Data Explorer" in page or "Ma'lumotlar" in page:
             apply_dark(fig2, title=t("Target bilan korrelyatsiya (Top 20)","Correlation with Target (Top 20)"), height=500)
             st.plotly_chart(fig2, use_container_width=True, key="eda_corr_bar")
         except Exception as e:
-            st.error(f"Korrelyatsiya xatosi: {e}")
+            st.error(f"Correlation error: {e}")
 
     with t4:
         feat_opts = [c for c in [
@@ -878,7 +878,7 @@ elif "Data Explorer" in page or "Ma'lumotlar" in page:
             dark_axes(fig2)
             st.plotly_chart(fig2, use_container_width=True, key="eda_subplots")
         except Exception as e:
-            st.error(f"Violin/boxplot xatosi: {e}")
+            st.error(f"Violin/boxplot error: {e}")
 
     with t5:
         if os.path.exists(FIGURES_DIR):
@@ -1031,7 +1031,7 @@ elif ("Predict" in page or "Bashorat" in page) and "Batch" not in page and "Omma
     sel_m = st.selectbox("🤖 Model:", MODELS, key="pred_model")
     model = load_mdl(sel_m)
     if not model:
-        st.error("❌ Model fayllari topilmadi.")
+        st.error("❌ Model files not found.")
         st.stop()
 
     # ── Demo profiles
@@ -1339,7 +1339,7 @@ elif ("Predict" in page or "Bashorat" in page) and "Batch" not in page and "Omma
                     f"</div>", unsafe_allow_html=True)
 
         except Exception as e:
-            st.error(f"Bashorat xatosi: {e}")
+            st.error(f"Prediction error: {e}")
             st.code(traceback.format_exc())
 
 
@@ -1494,9 +1494,9 @@ elif "Risk" in page or "Xavf" in page:
             st.stop()
 
     df_r = df_full.copy()
-    df_r["Bashorat"]  = [CLASSES[p] for p in preds]
-    df_r["Dropout_p"] = [float(p[0]) for p in probs]
-    df_r["Togri"]     = df_r["Target"] == df_r["Bashorat"]
+    df_r["Prediction"] = [CLASSES[p] for p in preds]
+    df_r["Dropout_p"]  = [float(p[0]) for p in probs]
+    df_r["Correct"]    = df_r["Target"] == df_r["Prediction"]
 
     st.markdown(f"<div class='sh'>🎛️ {t('Filtrlar','Filters')}</div>", unsafe_allow_html=True)
     f1, f2, f3 = st.columns(3)
@@ -1512,7 +1512,7 @@ elif "Risk" in page or "Xavf" in page:
     m1.metric(t("🔍 Filtrlangan","🔍 Filtered"), len(df_f))
     m2.metric(t("⚠️ Yuqori xavf","⚠️ High risk"), len(high))
     m3.metric(t("📊 Xavf ulushi","📊 Risk share"), f"{len(high)/max(len(df_f),1)*100:.1f}%")
-    m4.metric(t("✅ Aniqlik","✅ Accuracy"), f"{df_f['Togri'].mean():.2%}")
+    m4.metric(t("✅ Aniqlik","✅ Accuracy"), f"{df_f['Correct'].mean():.2%}")
 
     try:
         col_a, col_b = st.columns(2)
@@ -1526,7 +1526,7 @@ elif "Risk" in page or "Xavf" in page:
             st.plotly_chart(fig, use_container_width=True, key="risk_hist")
 
         with col_b:
-            cnt2 = df_f["Bashorat"].value_counts()
+            cnt2 = df_f["Prediction"].value_counts()
             fig2 = go.Figure(go.Pie(
                 labels=list(cnt2.index), values=list(cnt2.values),
                 marker=dict(colors=[CCOL[c] for c in cnt2.index],
@@ -1537,16 +1537,16 @@ elif "Risk" in page or "Xavf" in page:
             st.plotly_chart(fig2, use_container_width=True, key="risk_pie")
 
         df_f2 = df_f.copy()
-        df_f2["Yosh_guruh"] = pd.cut(df_f2["Age at enrollment"],
+        df_f2["Age_group"] = pd.cut(df_f2["Age at enrollment"],
             bins=[16,20,25,30,40,71], labels=["17-20","21-25","26-30","31-40","41+"])
-        age_risk = (df_f2.groupby("Yosh_guruh", observed=True)
-                    .agg(Dropout_ort=("Dropout_p","mean"))
+        age_risk = (df_f2.groupby("Age_group", observed=True)
+                    .agg(Dropout_avg=("Dropout_p","mean"))
                     .reset_index())
         fig3 = go.Figure(go.Bar(
-            x=age_risk["Yosh_guruh"].astype(str), y=age_risk["Dropout_ort"],
-            marker=dict(color=age_risk["Dropout_ort"],
+            x=age_risk["Age_group"].astype(str), y=age_risk["Dropout_avg"],
+            marker=dict(color=age_risk["Dropout_avg"],
                         colorscale="RdYlGn_r", showscale=True),
-            text=age_risk["Dropout_ort"].apply(lambda x: f"{x:.2f}"),
+            text=age_risk["Dropout_avg"].apply(lambda x: f"{x:.2f}"),
             textposition="outside", textfont=dict(color="#fff"),
         ))
         apply_dark(fig3, title=t("Yosh guruhlari bo'yicha Dropout ehtimoli","Dropout probability by age group"),
@@ -1562,11 +1562,11 @@ elif "Risk" in page or "Xavf" in page:
         dark_axes(fig4)
         st.plotly_chart(fig4, use_container_width=True, key="risk_scatter")
     except Exception as e:
-        st.error(f"Chart xatosi: {e}")
+        st.error(f"Chart error: {e}")
 
     st.markdown(f"<div class='sh'>⚠️ {t('Yuqori xavfdagi talabalar','High-risk students')} — {len(high)}</div>",
                 unsafe_allow_html=True)
-    show = [c for c in ["Target","Bashorat","Dropout_p","Gender","Age at enrollment",
+    show = [c for c in ["Target","Prediction","Dropout_p","Gender","Age at enrollment",
             "Scholarship holder","Debtor","Tuition fees up to date",
             "Curricular units 1st sem (approved)","Curricular units 2nd sem (approved)"]
             if c in high.columns]
@@ -1902,11 +1902,11 @@ elif "Hisobot" in page or "Report" in page:
         counts_html = " · ".join([f"<b>{c}</b>: {v}" for c,v in counts.items()])
 
         html = f"""<!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>EduPredict AI — Diplom Loyihasi Hisoboti</title>
+  <title>EduPredict AI — Diploma Project Report</title>
   <style>
     * {{ box-sizing:border-box; margin:0; padding:0; }}
     body {{ font-family:'Segoe UI',Arial,sans-serif; background:#f5f7fa; color:#222; }}
@@ -1937,33 +1937,33 @@ elif "Hisobot" in page or "Report" in page:
 </head>
 <body>
   <div class="header">
-    <h1>🎓 EduPredict AI — Diplom Loyihasi</h1>
-    <p>Talabalar Dropout va Akademik Muvaffaqiyatini Bashorat Qilish</p>
+    <h1>🎓 EduPredict AI — Diploma Project</h1>
+    <p>Student Dropout & Academic Outcome Prediction System</p>
     <span class="badge">📦 UCI Dataset · ID 697</span>
-    <span class="badge">👥 {len(df):,} talaba</span>
-    <span class="badge">🤖 {len(res)} ML model</span>
+    <span class="badge">👥 {len(df):,} students</span>
+    <span class="badge">🤖 {len(res)} ML models</span>
     <span class="badge">📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}</span>
   </div>
   <div class="container">
 
     <div class="section">
-      <h2>📊 Dataset Umumiy Ko'rinishi</h2>
+      <h2>📊 Dataset Overview</h2>
       <div class="stats">
-        <div class="stat-box"><div class="val">{len(df):,}</div><div class="lbl">Jami talabalar</div></div>
-        <div class="stat-box"><div class="val">{df.shape[1]-1}</div><div class="lbl">Xususiyatlar</div></div>
-        <div class="stat-box"><div class="val">3</div><div class="lbl">Sinflar</div></div>
-        <div class="stat-box"><div class="val">0</div><div class="lbl">Bo'sh qiymatlar</div></div>
+        <div class="stat-box"><div class="val">{len(df):,}</div><div class="lbl">Total students</div></div>
+        <div class="stat-box"><div class="val">{df.shape[1]-1}</div><div class="lbl">Features</div></div>
+        <div class="stat-box"><div class="val">3</div><div class="lbl">Classes</div></div>
+        <div class="stat-box"><div class="val">0</div><div class="lbl">Missing values</div></div>
       </div>
-      <p><b>Sinflar:</b> {counts_html}</p>
+      <p><b>Classes:</b> {counts_html}</p>
     </div>
 
     <div class="section">
-      <h2>🏆 Model Natijalari</h2>
+      <h2>🏆 Model Results</h2>
       <div class="stats">
-        <div class="stat-box"><div class="val">{best['Model']}</div><div class="lbl">Eng yaxshi model</div></div>
-        <div class="stat-box"><div class="val">{best['Accuracy']:.2%}</div><div class="lbl">Eng yuqori Accuracy</div></div>
-        <div class="stat-box"><div class="val">{best['ROC-AUC']:.4f}</div><div class="lbl">Eng yuqori AUC</div></div>
-        <div class="stat-box"><div class="val">{best['F1']:.4f}</div><div class="lbl">Eng yuqori F1</div></div>
+        <div class="stat-box"><div class="val">{best['Model']}</div><div class="lbl">Best model</div></div>
+        <div class="stat-box"><div class="val">{best['Accuracy']:.2%}</div><div class="lbl">Top Accuracy</div></div>
+        <div class="stat-box"><div class="val">{best['ROC-AUC']:.4f}</div><div class="lbl">Top AUC</div></div>
+        <div class="stat-box"><div class="val">{best['F1']:.4f}</div><div class="lbl">Top F1</div></div>
       </div>
       <table>
         <thead><tr><th>#</th><th>Model</th><th>Accuracy</th><th>F1</th>
@@ -1972,17 +1972,17 @@ elif "Hisobot" in page or "Report" in page:
       </table>
     </div>
 
-    {'<div class="section"><h2>📋 Cross-Validation Natijalari (5-Fold)</h2><table><thead><tr><th>Model</th><th>CV Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' + cv_rows + '</tbody></table></div>' if cv_rows else ''}
+    {'<div class="section"><h2>📋 Cross-Validation Results (5-Fold)</h2><table><thead><tr><th>Model</th><th>CV Mean</th><th>Std</th><th>Min</th><th>Max</th></tr></thead><tbody>' + cv_rows + '</tbody></table></div>' if cv_rows else ''}
 
     <div class="section">
-      <h2>🖼️ Vizualizatsiya Grafiklar</h2>
+      <h2>🖼️ Visualization Charts</h2>
       <div class="figs">{fig_html}</div>
     </div>
 
   </div>
   <div class="footer">
-    EduPredict AI · Diplom loyihasi · {datetime.now().year} ·
-    Machine Learning bilan talabalar natijasini bashorat qilish
+    EduPredict AI · Diploma Project · {datetime.now().year} ·
+    Student outcome prediction using Machine Learning
   </div>
 </body>
 </html>"""
