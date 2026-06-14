@@ -25,6 +25,16 @@ MODELS_DIR  = os.path.join(BASE, "models")
 FIGURES_DIR = os.path.join(BASE, "reports", "figures")
 REPORT_PATH = os.path.join(BASE, "reports", "model_results.json")
 
+# ══════════════════════════════════════ LANGUAGE
+if "lang" not in st.session_state:
+    st.session_state.lang = "UZ"
+
+def EN():
+    return st.session_state.lang == "EN"
+
+def t(uz, en):
+    return en if EN() else uz
+
 # ══════════════════════════════════════ CSS + JS
 st.markdown("""
 <style>
@@ -564,17 +574,27 @@ with st.sidebar:
     </style>
     """, unsafe_allow_html=True)
 
+    # ── Language toggle
+    col_l, col_r = st.columns(2)
+    if col_l.button("🇬🇧 English", use_container_width=True,
+                    type="primary" if EN() else "secondary"):
+        st.session_state.lang = "EN"; st.rerun()
+    if col_r.button("🇺🇿 O'zbek", use_container_width=True,
+                    type="primary" if not EN() else "secondary"):
+        st.session_state.lang = "UZ"; st.rerun()
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
     page = st.radio(
-        "Sahifalar",
+        "Pages",
         ["🏠  Dashboard",
-         "📊  Data Explorer",
-         "🤖  Model Results",
-         "🔮  Predict",
-         "📤  Batch Predict",
-         "📉  Risk Monitor",
+         "📊  " + t("Ma'lumotlar","Data Explorer"),
+         "🤖  " + t("Model Natijalari","Model Results"),
+         "🔮  " + t("Bashorat","Predict"),
+         "📤  " + t("Ommaviy Bashorat","Batch Predict"),
+         "📉  " + t("Xavf Monitor","Risk Monitor"),
          "🔬  SHAP Analysis",
          "📋  Cross-Validation",
-         "📄  Hisobot"],
+         "📄  " + t("Hisobot","Report")],
         label_visibility="collapsed",
     )
 
@@ -598,7 +618,7 @@ with st.sidebar:
         </div>
         <div style="background:rgba(0,212,255,.05);border-radius:8px;padding:9px 11px;
           border:1px solid rgba(0,212,255,.14);">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:#334155;text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Talabalar</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:#334155;text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Students</div>
           <div style="font-size:.82rem;font-weight:800;color:#E2E8F0;margin-top:3px;font-family:'Space Grotesk',sans-serif;">4,424</div>
         </div>
         <div style="background:rgba(139,92,246,.05);border-radius:8px;padding:9px 11px;
@@ -620,21 +640,30 @@ with st.sidebar:
 #  1 · DASHBOARD
 # ════════════════════════════════════════════════════
 if "Dashboard" in page:
-    st.markdown("""
+    _dash_title = "Student Outcome<br>Prediction System" if EN() else "Talabalar Natijasini<br>Bashorat Qilish Tizimi"
+    _dash_sub   = ("Predict student academic success, dropout risk and graduation probability "
+                   "in real time using Machine Learning." if EN() else
+                   "Machine Learning yordamida talabaning akademik muvaffaqiyatini, "
+                   "dropout xavfini va bitirish ehtimolini real vaqtda oldindan aniqlash.")
+    _dash_c4    = "📤 Batch Predict" if EN() else "📤 Batch Bashorat"
+    _dash_c8    = "📄 HTML Report"   if EN() else "📄 HTML Hisobot"
+    _dash_eye   = "Diploma project"  if EN() else "Diplom loyihasi"
+    _dash_ml    = "Models"           if EN() else "Model"
+    _dash_sm    = "Balance"          if EN() else "Balans"
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
-      <div class="eyebrow">🏆 Diplom loyihasi &nbsp;·&nbsp; 2026</div>
-      <div class="htitle">Talabalar Natijasini<br>Bashorat Qilish Tizimi</div>
-      <div class="hsub">Machine Learning yordamida talabaning akademik muvaffaqiyatini,
-        dropout xavfini va bitirish ehtimolini real vaqtda oldindan aniqlash.</div>
+      <div class="eyebrow">🏆 {_dash_eye} &nbsp;·&nbsp; 2026</div>
+      <div class="htitle">{_dash_title}</div>
+      <div class="hsub">{_dash_sub}</div>
       <div class="chips">
-        <span class="chip">🤖 9 ML Model</span>
-        <span class="chip">🧬 SMOTE Balans</span>
+        <span class="chip">🤖 9 ML {_dash_ml}</span>
+        <span class="chip">🧬 SMOTE {_dash_sm}</span>
         <span class="chip">🔬 SHAP · XAI</span>
-        <span class="chip">📤 Batch Bashorat</span>
+        <span class="chip">{_dash_c4}</span>
         <span class="chip">📉 Risk Monitor</span>
         <span class="chip">🗳️ Soft Voting Ensemble</span>
         <span class="chip">📋 Cross-Validation</span>
-        <span class="chip">📄 HTML Hisobot</span>
+        <span class="chip">{_dash_c8}</span>
       </div>
     </div>
     <div style="position:absolute;right:56px;top:50%;transform:translateY(-50%);
@@ -659,9 +688,9 @@ if "Dashboard" in page:
         backdrop-filter:blur(10px);">🎯</div>
     </div>
     <style>
-    @keyframes orb1{0%,100%{transform:translateY(0)}33%{transform:translateY(-8px)}}
-    @keyframes orb2{0%,100%{transform:translateY(0)}66%{transform:translateY(-6px)}}
-    @keyframes orb3{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    @keyframes orb1{{0%,100%{{transform:translateY(0)}}33%{{transform:translateY(-8px)}}}}
+    @keyframes orb2{{0%,100%{{transform:translateY(0)}}66%{{transform:translateY(-6px)}}}}
+    @keyframes orb3{{0%,100%{{transform:translateY(0)}}50%{{transform:translateY(-10px)}}}}
     </style>
     </div>""", unsafe_allow_html=True)
 
@@ -673,11 +702,11 @@ if "Dashboard" in page:
 
     c1,c2,c3,c4,c5 = st.columns(5)
     for col, ico, val, lbl in [
-        (c1,"👥",f"{len(df):,}","Jami talabalar"),
-        (c2,"📐",f"{df.shape[1]-1}","Xususiyatlar"),
-        (c3,"🏆",best_name,"Eng yaxshi model"),
-        (c4,"🎯",f"{best_acc:.1%}","Eng yuqori Accuracy"),
-        (c5,"🔵",f"{best_auc:.3f}","Eng yuqori AUC"),
+        (c1,"👥",f"{len(df):,}",t("Jami talabalar","Total students")),
+        (c2,"📐",f"{df.shape[1]-1}",t("Xususiyatlar","Features")),
+        (c3,"🏆",best_name,t("Eng yaxshi model","Best model")),
+        (c4,"🎯",f"{best_acc:.1%}",t("Eng yuqori Accuracy","Top Accuracy")),
+        (c5,"🔵",f"{best_auc:.3f}",t("Eng yuqori AUC","Top AUC")),
     ]:
         col.markdown(
             f"<div class='stat'><span class='si'>{ico}</span>"
@@ -697,10 +726,10 @@ if "Dashboard" in page:
                 text=list(counts.values), textposition="outside",
                 textfont=dict(color="#C4B5FD", size=14),
             ))
-            apply_dark(fig, title="Sinflar taqsimoti", height=340, showlegend=False)
+            apply_dark(fig, title=t("Sinflar taqsimoti","Class distribution"), height=340, showlegend=False)
             st.plotly_chart(fig, use_container_width=True, key="dash_bar")
         except Exception as e:
-            st.error(f"Bar chart xatosi: {e}")
+            st.error(f"Bar chart: {e}")
 
     with cr:
         try:
@@ -709,13 +738,13 @@ if "Dashboard" in page:
                 marker=dict(colors=[CCOL[c] for c in counts.index],
                             line=dict(color="rgba(0,0,0,.4)", width=3)),
                 hole=.42, textfont=dict(size=13),
-                hovertemplate="<b>%{label}</b><br>%{value} talaba<br>%{percent}<extra></extra>",
+                hovertemplate=f"<b>%{{label}}</b><br>%{{value}} {t('talaba','students')}<br>%{{percent}}<extra></extra>",
             ))
-            fig2.update_layout(**dark_fig(), title="Foiz taqsimoti", height=340,
+            fig2.update_layout(**dark_fig(), title=t("Foiz taqsimoti","Percentage distribution"), height=340,
                                legend=dict(font=dict(color="#A78BFA")))
             st.plotly_chart(fig2, use_container_width=True, key="dash_pie")
         except Exception as e:
-            st.error(f"Pie chart xatosi: {e}")
+            st.error(f"Pie chart: {e}")
 
     if res:
         try:
@@ -730,40 +759,42 @@ if "Dashboard" in page:
             fig3.add_trace(go.Bar(name="ROC-AUC", x=df_ov["Model"], y=df_ov["AUC"],
                 marker_color="#0ea5e9", text=df_ov["AUC"].apply(lambda x: f"{x:.3f}"),
                 textposition="outside", textfont=dict(color="#94A3B8")))
-            apply_dark(fig3, title="Barcha modellar ko'rsatkichlari",
+            apply_dark(fig3, title=t("Barcha modellar ko'rsatkichlari","All models performance"),
                        barmode="group", height=380, legend=dict(font=dict(color="#A78BFA")))
             st.plotly_chart(fig3, use_container_width=True, key="dash_models")
         except Exception as e:
-            st.error(f"Model chart xatosi: {e}")
+            st.error(f"Model chart: {e}")
 
 
 
 # ════════════════════════════════════════════════════
 #  2 · DATA EXPLORER
 # ════════════════════════════════════════════════════
-elif "Data Explorer" in page:
-    st.markdown("""
+elif "Data Explorer" in page or "Ma'lumotlar" in page:
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
       <div class="eyebrow">📊 EDA</div>
-      <div class="htitle">Ma'lumotlar Tahlili</div>
-      <div class="hsub">Dataset tuzilmasi, taqsimot va korrelyatsiyalarni o'rganish</div>
+      <div class="htitle">{"Data Analysis" if EN() else "Ma'lumotlar Tahlili"}</div>
+      <div class="hsub">{"Explore dataset structure, distributions and correlations" if EN() else "Dataset tuzilmasi, taqsimot va korrelyatsiyalarni o'rganish"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     df = load_df()
-    t1,t2,t3,t4,t5 = st.tabs(["📋 Dataset","📊 Taqsimot","📈 Korrelyatsiya","📦 Sinf Tahlili","🖼️ Grafiklar"])
+    _tabs = (["📋 Dataset","📊 Distribution","📈 Correlation","📦 Class Analysis","🖼️ Charts"] if EN() else
+             ["📋 Dataset","📊 Taqsimot","📈 Korrelyatsiya","📦 Sinf Tahlili","🖼️ Grafiklar"])
+    t1,t2,t3,t4,t5 = st.tabs(_tabs)
 
     with t1:
         m1,m2,m3,m4 = st.columns(4)
-        m1.metric("Qatorlar", f"{len(df):,}")
-        m2.metric("Ustunlar", df.shape[1])
-        m3.metric("Raqamli ustun", df.select_dtypes(include=np.number).shape[1])
-        m4.metric("Bo'sh qiymat", df.isnull().sum().sum())
-        n = st.slider("Ko'rsatiladigan qatorlar", 10, 300, 50, key="eda_slider")
+        m1.metric("Rows" if EN() else "Qatorlar", f"{len(df):,}")
+        m2.metric("Columns" if EN() else "Ustunlar", df.shape[1])
+        m3.metric("Numeric cols" if EN() else "Raqamli ustun", df.select_dtypes(include=np.number).shape[1])
+        m4.metric("Missing values" if EN() else "Bo'sh qiymat", df.isnull().sum().sum())
+        n = st.slider("Rows to show" if EN() else "Ko'rsatiladigan qatorlar", 10, 300, 50, key="eda_slider")
         st.dataframe(df.head(n), use_container_width=True, height=380)
 
     with t2:
         num_cols = df.select_dtypes(include=np.number).columns.tolist()
-        col_sel = st.selectbox("Ustun tanlang:", num_cols, key="eda_col")
+        col_sel = st.selectbox(t("Ustun tanlang:","Select column:"), num_cols, key="eda_col")
         try:
             fig = go.Figure()
             for cls, color in CCOL.items():
@@ -771,7 +802,7 @@ elif "Data Explorer" in page:
                 if not sub.empty:
                     fig.add_trace(go.Histogram(x=sub, name=cls, marker_color=color,
                         opacity=.75, nbinsx=30))
-            apply_dark(fig, barmode="overlay", title=f"{col_sel} — taqsimot", height=360)
+            apply_dark(fig, barmode="overlay", title=f"{col_sel} — {t('taqsimot','distribution')}", height=360)
             st.plotly_chart(fig, use_container_width=True, key="eda_hist")
 
             fig2 = go.Figure()
@@ -796,7 +827,7 @@ elif "Data Explorer" in page:
                 hovertemplate="%{y} × %{x}: %{z:.3f}<extra></extra>",
                 colorbar=dict(tickfont=dict(color="#94A3B8")),
             ))
-            fig.update_layout(**dark_fig(), title="Korrelyatsiya matritsasi", height=680)
+            fig.update_layout(**dark_fig(), title=t("Korrelyatsiya matritsasi","Correlation matrix"), height=680)
             fig.update_xaxes(tickangle=-45, tickfont=dict(size=8, color="#94A3B8"),
                              gridcolor="rgba(139,92,246,.08)")
             fig.update_yaxes(tickfont=dict(size=8, color="#94A3B8"),
@@ -810,7 +841,7 @@ elif "Data Explorer" in page:
                 hovertemplate="%{y}: %{x:.4f}<extra></extra>",
             ))
             fig2.add_vline(x=0, line_color="rgba(255,255,255,.3)")
-            apply_dark(fig2, title="Target bilan korrelyatsiya (Top 20)", height=500)
+            apply_dark(fig2, title=t("Target bilan korrelyatsiya (Top 20)","Correlation with Target (Top 20)"), height=500)
             st.plotly_chart(fig2, use_container_width=True, key="eda_corr_bar")
         except Exception as e:
             st.error(f"Korrelyatsiya xatosi: {e}")
@@ -820,7 +851,7 @@ elif "Data Explorer" in page:
             "Curricular units 1st sem (grade)", "Curricular units 2nd sem (grade)",
             "Curricular units 1st sem (approved)", "Age at enrollment", "Admission grade",
         ] if c in df.columns]
-        feat4 = st.selectbox("Ko'rsatkich:", feat_opts, key="eda_feat4")
+        feat4 = st.selectbox(t("Ko'rsatkich:","Feature:"), feat_opts, key="eda_feat4")
         try:
             fig = go.Figure()
             for cls, color in CCOL.items():
@@ -841,8 +872,9 @@ elif "Data Explorer" in page:
                 sub = df[df["Target"] == cls][feat4]
                 fig2.add_trace(go.Histogram(x=sub, marker_color=color,
                     opacity=.8, showlegend=False, nbinsx=25), row=1, col=i+1)
+            _cls_dist = t("Sinf bo'yicha taqsimot","Distribution by class")
             fig2.update_layout(**dark_fig(),
-                title=f"{feat4} — Sinf bo'yicha taqsimot", height=320)
+                title=f"{feat4} — {_cls_dist}", height=320)
             dark_axes(fig2)
             st.plotly_chart(fig2, use_container_width=True, key="eda_subplots")
         except Exception as e:
@@ -859,23 +891,23 @@ elif "Data Explorer" in page:
                         caption=fn.replace(".png","").replace("_"," ").title(),
                         use_container_width=True)
             else:
-                st.info("📊 Grafiklar mavjud emas.")
+                st.info(t("📊 Grafiklar mavjud emas.","📊 No charts available."))
 
 
 # ════════════════════════════════════════════════════
 #  3 · MODEL RESULTS
 # ════════════════════════════════════════════════════
-elif "Model Results" in page:
-    st.markdown("""
+elif "Model Results" in page or "Model Natijalari" in page:
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
-      <div class="eyebrow">🤖 ML Modellar</div>
-      <div class="htitle">Model Natijalari</div>
-      <div class="hsub">9 ta ML model o'qitildi, baholandi va taqqoslandi</div>
+      <div class="eyebrow">🤖 {"ML Models" if EN() else "ML Modellar"}</div>
+      <div class="htitle">{"Model Results" if EN() else "Model Natijalari"}</div>
+      <div class="hsub">{"9 ML models trained, evaluated and compared" if EN() else "9 ta ML model o'qitildi, baholandi va taqqoslandi"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     res = load_res()
     if not res:
-        st.warning("⚠️ Ma'lumotlar topilmadi.")
+        st.warning(t("⚠️ Ma'lumotlar topilmadi.","⚠️ No data found."))
         st.stop()
 
     rows = [{"Model":n,"Accuracy":m.get("accuracy",0),"F1":m.get("f1",0),
@@ -904,8 +936,8 @@ elif "Model Results" in page:
 
 
     st.markdown("---")
-    st.markdown("<div class='sh'>🔍 Model tafsilotlari</div>", unsafe_allow_html=True)
-    sel = st.selectbox("Model tanlang:", MODELS, key="mr_sel")
+    st.markdown(f"<div class='sh'>🔍 {t('Model tafsilotlari','Model Details')}</div>", unsafe_allow_html=True)
+    sel = st.selectbox(t("Model tanlang:","Select model:"), MODELS, key="mr_sel")
     m   = res.get(sel, {})
 
     mc1,mc2,mc3,mc4,mc5 = st.columns(5)
@@ -938,7 +970,7 @@ elif "Model Results" in page:
             any_fig_shown = True
 
     if not any_fig_shown:
-        st.info("📊 Grafiklar mavjud emas.")
+        st.info(t("📊 Grafiklar mavjud emas.","📊 No charts available."))
 
     # Per-class metrics figure
     pc_fig = os.path.join(FIGURES_DIR, f"11_per_class_{safe}.png")
@@ -951,13 +983,14 @@ elif "Model Results" in page:
         with open(PC_PATH) as f_pc:
             pc_data = json.load(f_pc)
         if sel in pc_data:
-            st.markdown("<div class='sh'>📋 Sinf bo'yicha batafsil metrikalar</div>", unsafe_allow_html=True)
+            _pc_hdr = t("Sinf bo'yicha batafsil metrikalar","Detailed per-class metrics")
+            st.markdown(f"<div class='sh'>📋 {_pc_hdr}</div>", unsafe_allow_html=True)
             pc_rep = pc_data[sel]
             rows_pc = []
             for cls in CLASSES:
                 if cls in pc_rep and isinstance(pc_rep[cls], dict):
                     rows_pc.append({
-                        "Sinf": cls,
+                        t("Sinf","Class"): cls,
                         "Precision": round(pc_rep[cls].get("precision", 0), 4),
                         "Recall":    round(pc_rep[cls].get("recall", 0), 4),
                         "F1-Score":  round(pc_rep[cls].get("f1-score", 0), 4),
@@ -976,7 +1009,7 @@ elif "Model Results" in page:
     if os.path.exists(pkl):
         with open(pkl, "rb") as f:
             st.download_button(
-                f"⬇️  {sel} modelini .pkl yuklab olish",
+                f"⬇️  {sel} {t('modelini .pkl yuklab olish','model — download .pkl')}",
                 data=f.read(),
                 file_name=f"{safe}.pkl",
                 mime="application/octet-stream",
@@ -987,12 +1020,12 @@ elif "Model Results" in page:
 # ════════════════════════════════════════════════════
 #  4 · PREDICT
 # ════════════════════════════════════════════════════
-elif "Predict" in page and "Batch" not in page:
-    st.markdown("""
+elif ("Predict" in page or "Bashorat" in page) and "Batch" not in page and "Ommaviy" not in page:
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
-      <div class="eyebrow">🔮 AI Bashorat</div>
-      <div class="htitle">Talaba Holatini Aniqlash</div>
-      <div class="hsub">Ma'lumotlarni kiriting — model darhol Dropout · Enrolled · Graduate bashorat qiladi</div>
+      <div class="eyebrow">🔮 {"AI Prediction" if EN() else "AI Bashorat"}</div>
+      <div class="htitle">{"Predict Student Outcome" if EN() else "Talaba Holatini Aniqlash"}</div>
+      <div class="hsub">{"Enter data — model instantly predicts Dropout · Enrolled · Graduate" if EN() else "Ma'lumotlarni kiriting — model darhol Dropout · Enrolled · Graduate bashorat qiladi"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     sel_m = st.selectbox("🤖 Model:", MODELS, key="pred_model")
@@ -1033,18 +1066,18 @@ elif "Predict" in page and "Batch" not in page:
     }
 
     # ── Demo buttons
-    st.markdown("<div class='sh'>⚡ Demo namunalar — bir bosishda sinab ko'ring</div>",
-                unsafe_allow_html=True)
+    _demo_hdr = t("⚡ Demo namunalar — bir bosishda sinab ko'ring","⚡ Demo samples — try with one click")
+    st.markdown(f"<div class='sh'>{_demo_hdr}</div>", unsafe_allow_html=True)
     dc1, dc2, dc3 = st.columns(3)
-    if dc1.button("🎓 A'lo talaba (Graduate)", use_container_width=True, key="demo_grad"):
+    if dc1.button(t("🎓 A'lo talaba (Graduate)","🎓 Top student (Graduate)"), use_container_width=True, key="demo_grad"):
         for k, v in DEMOS["graduate"].items(): st.session_state[k] = v
         st.session_state["auto_predict"] = True
         st.rerun()
-    if dc2.button("⚠️ Xavf ostida (Dropout)", use_container_width=True, key="demo_drop"):
+    if dc2.button(t("⚠️ Xavf ostida (Dropout)","⚠️ At-risk (Dropout)"), use_container_width=True, key="demo_drop"):
         for k, v in DEMOS["dropout"].items(): st.session_state[k] = v
         st.session_state["auto_predict"] = True
         st.rerun()
-    if dc3.button("📚 O'qishda davom (Enrolled)", use_container_width=True, key="demo_enrl"):
+    if dc3.button(t("📚 O'qishda davom (Enrolled)","📚 Still Enrolled (Enrolled)"), use_container_width=True, key="demo_enrl"):
         for k, v in DEMOS["enrolled"].items(): st.session_state[k] = v
         st.session_state["auto_predict"] = True
         st.rerun()
@@ -1055,96 +1088,107 @@ elif "Predict" in page and "Batch" not in page:
     left, right = st.columns(2, gap="large")
 
     with left:
-        st.markdown("<div class='sh'>👤 Shaxsiy va moliyaviy</div>", unsafe_allow_html=True)
-        age    = st.slider("🎂 Yosh (qabul paytida)", 17, 70, 20, key="p_age")
-        gender = st.selectbox("⚧ Jins", [0, 1],
-                    format_func=lambda x: "👩 Ayol" if x == 0 else "👨 Erkak",
+        st.markdown(f"<div class='sh'>{t('👤 Shaxsiy va moliyaviy','👤 Personal & Financial')}</div>", unsafe_allow_html=True)
+        age    = st.slider(t("🎂 Yosh (qabul paytida)","🎂 Age (at enrollment)"), 17, 70, 20, key="p_age")
+        _yes   = t("✅ Ha","✅ Yes")
+        _no    = t("❌ Yo'q","❌ No")
+        gender = st.selectbox(t("⚧ Jins","⚧ Gender"), [0, 1],
+                    format_func=lambda x: (t("👩 Ayol","👩 Female") if x == 0 else t("👨 Erkak","👨 Male")),
                     key="p_gender")
-        tuition = st.selectbox("💳 To'lov muddatida to'langan", [1, 0],
-                    format_func=lambda x: "✅ Ha" if x == 1 else "❌ Yo'q",
+        tuition = st.selectbox(t("💳 To'lov muddatida to'langan","💳 Tuition fees up to date"), [1, 0],
+                    format_func=lambda x: _yes if x == 1 else _no,
                     key="p_tuition")
-        schol  = st.selectbox("🎓 Stipendiyant", [0, 1],
-                    format_func=lambda x: "Yo'q" if x == 0 else "✅ Ha",
+        schol  = st.selectbox(t("🎓 Stipendiyant","🎓 Scholarship holder"), [0, 1],
+                    format_func=lambda x: _no if x == 0 else _yes,
                     key="p_schol")
-        debtor = st.selectbox("💸 Qarzdor", [0, 1],
-                    format_func=lambda x: "Yo'q" if x == 0 else "⚠️ Ha",
+        debtor = st.selectbox(t("💸 Qarzdor","💸 Debtor"), [0, 1],
+                    format_func=lambda x: _no if x == 0 else t("⚠️ Ha","⚠️ Yes"),
                     key="p_debtor")
-        adg    = st.slider("📋 Qabul bahosi", 95.0, 190.0, 127.0, key="p_adg")
+        adg    = st.slider(t("📋 Qabul bahosi","📋 Admission grade"), 95.0, 190.0, 127.0, key="p_adg")
 
     with right:
-        st.markdown("<div class='sh'>📖 Akademik natijalar</div>", unsafe_allow_html=True)
-        st.markdown("**1-Semestr**")
+        st.markdown(f"<div class='sh'>{t('📖 Akademik natijalar','📖 Academic results')}</div>", unsafe_allow_html=True)
+        st.markdown(f"**{t('1-Semestr','Semester 1')}**")
         r1a, r1b, r1c = st.columns(3)
-        s1en = r1a.slider("Yozilgan fan", 0, 26, 6, key="s1en")
-        s1ap = r1b.slider("O'tilgan fan", 0, 26, 5, key="s1ap")
-        s1gr = r1c.slider("O'rtacha baho", 0.0, 20.0, 12.0, key="s1gr")
+        s1en = r1a.slider(t("Yozilgan fan","Enrolled units"), 0, 26, 6, key="s1en")
+        s1ap = r1b.slider(t("O'tilgan fan","Approved units"), 0, 26, 5, key="s1ap")
+        s1gr = r1c.slider(t("O'rtacha baho","Avg grade"), 0.0, 20.0, 12.0, key="s1gr")
 
-        st.markdown("**2-Semestr**")
+        st.markdown(f"**{t('2-Semestr','Semester 2')}**")
         r2a, r2b, r2c = st.columns(3)
-        s2en = r2a.slider("Yozilgan fan", 0, 23, 6, key="s2en")
-        s2ap = r2b.slider("O'tilgan fan", 0, 20, 5, key="s2ap")
-        s2gr = r2c.slider("O'rtacha baho", 0.0, 20.0, 12.0, key="s2gr")
+        s2en = r2a.slider(t("Yozilgan fan","Enrolled units"), 0, 23, 6, key="s2en")
+        s2ap = r2b.slider(t("O'tilgan fan","Approved units"), 0, 20, 5, key="s2ap")
+        s2gr = r2c.slider(t("O'rtacha baho","Avg grade"), 0.0, 20.0, 12.0, key="s2gr")
 
     # ── Advanced settings expander
     st.markdown("<br>", unsafe_allow_html=True)
-    with st.expander("⚙️ Kengaytirilgan sozlamalar — qo'shimcha maydonlar (ixtiyoriy)", expanded=False):
-        st.markdown("<div class='sh'>📋 Ijtimoiy va oilaviy ma'lumotlar</div>", unsafe_allow_html=True)
+    _adv_lbl  = t("⚙️ Kengaytirilgan sozlamalar — qo'shimcha maydonlar (ixtiyoriy)","⚙️ Advanced settings — optional fields")
+    _sh_soc   = t("📋 Ijtimoiy va oilaviy ma'lumotlar","📋 Social & family data")
+    _sh_par   = t("👨‍👩‍👧 Ota-ona ma'lumotlari","👨‍👩‍👧 Parent data")
+    _sh_adm   = t("🎓 Qabul va kurs ma'lumotlari","🎓 Admission & course data")
+    _sh_sem   = t("📖 Semestr batafsil","📖 Semester detail")
+    _sh_mac   = t("🌍 Makroiqtisodiy ko'rsatkichlar","🌍 Macroeconomic indicators")
+    with st.expander(_adv_lbl, expanded=False):
+        _yn  = lambda x: (_no if x==0 else _yes)
+        st.markdown(f"<div class='sh'>{_sh_soc}</div>", unsafe_allow_html=True)
         adv1, adv2, adv3 = st.columns(3)
-        marital = adv1.selectbox("💍 Oilaviy holat", [1,2,3,4,5,6],
-            format_func=lambda x: {1:"Yagona",2:"Turmush qurgan",3:"Keva",4:"Ajrashgan",5:"Birga yashovchi",6:"Qonuniy ajrashgan"}.get(x,str(x)),
+        _marital_uz = {1:"Yagona",2:"Turmush qurgan",3:"Keva",4:"Ajrashgan",5:"Birga yashovchi",6:"Qonuniy ajrashgan"}
+        _marital_en = {1:"Single",2:"Married",3:"Widower",4:"Divorced",5:"Facto union",6:"Legally separated"}
+        marital = adv1.selectbox(t("💍 Oilaviy holat","💍 Marital status"), [1,2,3,4,5,6],
+            format_func=lambda x: (_marital_en if EN() else _marital_uz).get(x,str(x)),
             key="p_marital")
-        displ   = adv2.selectbox("🏘️ Ko'chib kelgan", [0,1],
-            format_func=lambda x: "Yo'q" if x==0 else "✅ Ha", key="p_displ")
-        spcn    = adv3.selectbox("♿ Maxsus ehtiyoj", [0,1],
-            format_func=lambda x: "Yo'q" if x==0 else "✅ Ha", key="p_spcn")
+        displ   = adv2.selectbox(t("🏘️ Ko'chib kelgan","🏘️ Displaced"), [0,1],
+            format_func=_yn, key="p_displ")
+        spcn    = adv3.selectbox(t("♿ Maxsus ehtiyoj","♿ Special needs"), [0,1],
+            format_func=_yn, key="p_spcn")
 
         adv4, adv5 = st.columns(2)
-        intl    = adv4.selectbox("🌍 Xorijiy talaba", [0,1],
-            format_func=lambda x: "Yo'q" if x==0 else "✅ Ha", key="p_intl")
-        nation  = adv5.number_input("🗺️ Millat (kodi)", 1, 109, 1, key="p_nation")
+        intl    = adv4.selectbox(t("🌍 Xorijiy talaba","🌍 International student"), [0,1],
+            format_func=_yn, key="p_intl")
+        nation  = adv5.number_input(t("🗺️ Millat (kodi)","🗺️ Nationality (code)"), 1, 109, 1, key="p_nation")
 
-        st.markdown("<div class='sh'>👨‍👩‍👧 Ota-ona ma'lumotlari</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='sh'>{_sh_par}</div>", unsafe_allow_html=True)
         oe1, oe2, oe3, oe4 = st.columns(4)
-        mq = oe1.number_input("Ona ta'lim darajasi", 0, 44, 19, key="p_mq")
-        fq = oe2.number_input("Ota ta'lim darajasi", 0, 44, 22, key="p_fq")
-        mo = oe3.number_input("Ona kasbi (kodi)", 0, 194, 10, key="p_mo")
-        fo = oe4.number_input("Ota kasbi (kodi)", 0, 194, 10, key="p_fo")
+        mq = oe1.number_input(t("Ona ta'lim darajasi","Mother's education"), 0, 44, 19, key="p_mq")
+        fq = oe2.number_input(t("Ota ta'lim darajasi","Father's education"), 0, 44, 22, key="p_fq")
+        mo = oe3.number_input(t("Ona kasbi (kodi)","Mother's occupation"), 0, 194, 10, key="p_mo")
+        fo = oe4.number_input(t("Ota kasbi (kodi)","Father's occupation"), 0, 194, 10, key="p_fo")
 
-        st.markdown("<div class='sh'>🎓 Qabul va kurs ma'lumotlari</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='sh'>{_sh_adm}</div>", unsafe_allow_html=True)
         qa1, qa2, qa3, qa4 = st.columns(4)
-        amode = qa1.number_input("Ariza usuli (kodi)", 1, 57, 1, key="p_amode")
-        aord  = qa2.number_input("Ariza tartibi", 0, 9, 1, key="p_aord")
-        crs   = qa3.number_input("Kurs (kodi)", 0, 9999, 9500, key="p_crs")
-        att   = qa4.selectbox("Dars vaqti", [1,0],
-            format_func=lambda x: "🌞 Kunduzgi" if x==1 else "🌙 Kechki", key="p_att")
+        amode = qa1.number_input(t("Ariza usuli (kodi)","Application mode (code)"), 1, 57, 1, key="p_amode")
+        aord  = qa2.number_input(t("Ariza tartibi","Application order"), 0, 9, 1, key="p_aord")
+        crs   = qa3.number_input(t("Kurs (kodi)","Course (code)"), 0, 9999, 9500, key="p_crs")
+        att   = qa4.selectbox(t("Dars vaqti","Attendance time"), [1,0],
+            format_func=lambda x: (t("🌞 Kunduzgi","🌞 Daytime") if x==1 else t("🌙 Kechki","🌙 Evening")), key="p_att")
 
         qa5, qa6 = st.columns(2)
-        pq  = qa5.number_input("Oldingi ta'lim turi (kodi)", 1, 43, 1, key="p_pq")
-        pqg = qa6.slider("Oldingi ta'lim bahosi", 0.0, 200.0, 130.0, key="p_pqg")
+        pq  = qa5.number_input(t("Oldingi ta'lim turi (kodi)","Previous qualification (code)"), 1, 43, 1, key="p_pq")
+        pqg = qa6.slider(t("Oldingi ta'lim bahosi","Previous qualification grade"), 0.0, 200.0, 130.0, key="p_pqg")
 
-        st.markdown("<div class='sh'>📖 Semestr batafsil</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='sh'>{_sh_sem}</div>", unsafe_allow_html=True)
         sem_a, sem_b = st.columns(2)
         with sem_a:
-            st.caption("1-Semestr")
-            s1cr = st.number_input("Kredit (1-sem)", 0, 20, 0, key="s1cr")
-            s1ev = st.number_input("Baholangan (1-sem)", 0, 45, s1en, key="s1ev")
-            s1ne = st.number_input("Bahosiz (1-sem)", 0, 19, 0, key="s1ne")
+            st.caption(t("1-Semestr","Semester 1"))
+            s1cr = st.number_input(t("Kredit (1-sem)","Credit (sem 1)"), 0, 20, 0, key="s1cr")
+            s1ev = st.number_input(t("Baholangan (1-sem)","Evaluated (sem 1)"), 0, 45, s1en, key="s1ev")
+            s1ne = st.number_input(t("Bahosiz (1-sem)","No eval (sem 1)"), 0, 19, 0, key="s1ne")
         with sem_b:
-            st.caption("2-Semestr")
-            s2cr = st.number_input("Kredit (2-sem)", 0, 19, 0, key="s2cr")
-            s2ev = st.number_input("Baholangan (2-sem)", 0, 45, s2en, key="s2ev")
-            s2ne = st.number_input("Bahosiz (2-sem)", 0, 12, 0, key="s2ne")
+            st.caption(t("2-Semestr","Semester 2"))
+            s2cr = st.number_input(t("Kredit (2-sem)","Credit (sem 2)"), 0, 19, 0, key="s2cr")
+            s2ev = st.number_input(t("Baholangan (2-sem)","Evaluated (sem 2)"), 0, 45, s2en, key="s2ev")
+            s2ne = st.number_input(t("Bahosiz (2-sem)","No eval (sem 2)"), 0, 12, 0, key="s2ne")
 
-        st.markdown("<div class='sh'>🌍 Makroiqtisodiy ko'rsatkichlar</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='sh'>{_sh_mac}</div>", unsafe_allow_html=True)
         me1, me2, me3 = st.columns(3)
-        unemp = me1.slider("📉 Ishsizlik darajasi (%)", 7.0, 17.0, 11.5, 0.1, key="p_unemp")
-        infl  = me2.slider("📈 Inflyatsiya darajasi (%)", -0.8, 3.3, 1.2, 0.1, key="p_infl")
-        gdp   = me3.slider("💹 YaIM o'sishi (%)", -4.1, 3.5, 0.0, 0.1, key="p_gdp")
+        unemp = me1.slider(t("📉 Ishsizlik darajasi (%)","📉 Unemployment rate (%)"), 7.0, 17.0, 11.5, 0.1, key="p_unemp")
+        infl  = me2.slider(t("📈 Inflyatsiya darajasi (%)","📈 Inflation rate (%)"), -0.8, 3.3, 1.2, 0.1, key="p_infl")
+        gdp   = me3.slider(t("💹 YaIM o'sishi (%)","💹 GDP growth (%)"), -4.1, 3.5, 0.0, 0.1, key="p_gdp")
 
     # ── Predict button
     st.markdown("<br>", unsafe_allow_html=True)
     _, bc, _ = st.columns([1, 2, 1])
-    go_pred   = bc.button("🔮  Bashorat Qilish", type="primary",
+    go_pred   = bc.button(t("🔮  Bashorat Qilish","🔮  Predict"), type="primary",
                           use_container_width=True, key="pred_go")
     auto_pred = st.session_state.pop("auto_predict", False)
 
@@ -1180,9 +1224,11 @@ elif "Predict" in page and "Batch" not in page:
             label = CLASSES[preds[0]]
             prob  = probs[0]
             b_cls = {"Dropout":"rb-d","Enrolled":"rb-e","Graduate":"rb-g"}[label]
-            b_txt = {"Dropout":"⚠️ DROPOUT XAVFI",
-                     "Enrolled":"📚 O'QISHDA DAVOM ETADI",
-                     "Graduate":"🎓 MUVAFFAQIYATLI BITIRADI"}[label]
+            b_txt = {
+                "Dropout":  t("⚠️ DROPOUT XAVFI","⚠️ DROPOUT RISK"),
+                "Enrolled": t("📚 O'QISHDA DAVOM ETADI","📚 STILL ENROLLED"),
+                "Graduate": t("🎓 MUVAFFAQIYATLI BITIRADI","🎓 WILL GRADUATE"),
+            }[label]
 
             st.markdown("---")
             _, rc, _ = st.columns([1, 2, 1])
@@ -1191,7 +1237,7 @@ elif "Predict" in page and "Batch" not in page:
                     f"<div style='text-align:center;padding:16px 0;'>"
                     f"<div style='font-size:.8rem;color:#8B5CF6;margin-bottom:12px;"
                     f"letter-spacing:.08em;text-transform:uppercase;font-weight:700;'>"
-                    f"Bashorat natijasi · {sel_m}</div>"
+                    f"{t('Bashorat natijasi','Prediction result')} · {sel_m}</div>"
                     f"<div class='rbadge {b_cls}'>{b_txt}</div>"
                     f"</div>", unsafe_allow_html=True)
 
@@ -1223,15 +1269,18 @@ elif "Predict" in page and "Batch" not in page:
                     pass
 
             tip = {
-                "Dropout": "⚠️ **Xavf darajasi: YUQORI** — Talabaga shoshilinch akademik va moliyaviy yordam kerak.",
-                "Enrolled": "📚 **Holat: KUZATUVDA** — Talaba o'qishda. Motivatsiya va doimiy monitoring tavsiya etiladi.",
-                "Graduate": "🎓 **Holat: A'LO** — Talaba muvaffaqiyatli bitirish yo'lida. Mavjud sharoitlarni saqlang.",
+                "Dropout":  t("⚠️ **Xavf darajasi: YUQORI** — Talabaga shoshilinch akademik va moliyaviy yordam kerak.",
+                              "⚠️ **Risk level: HIGH** — Student needs urgent academic and financial support."),
+                "Enrolled": t("📚 **Holat: KUZATUVDA** — Talaba o'qishda. Motivatsiya va doimiy monitoring tavsiya etiladi.",
+                              "📚 **Status: MONITORING** — Student is enrolled. Motivation and regular monitoring recommended."),
+                "Graduate": t("🎓 **Holat: A'LO** — Talaba muvaffaqiyatli bitirish yo'lida. Mavjud sharoitlarni saqlang.",
+                              "🎓 **Status: EXCELLENT** — Student is on track to graduate. Maintain current conditions."),
             }
             st.info(tip[label])
 
             # ── Barcha modellar taqqoslash
             st.markdown("---")
-            st.markdown("<div class='sh'>🔬 Barcha modellar taqqoslash</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='sh'>🔬 {t('Barcha modellar taqqoslash','All models comparison')}</div>", unsafe_allow_html=True)
             df_input = pd.DataFrame([row])
             all_results = []
             for mname in MODELS:
@@ -1265,7 +1314,7 @@ elif "Predict" in page and "Batch" not in page:
                         textfont=dict(color="#C4B5FD", size=9),
                     ))
                 apply_dark(fig_cmp,
-                    title="Barcha modellar — Dropout · Enrolled · Graduate ehtimoli",
+                    title=t("Barcha modellar — Dropout · Enrolled · Graduate ehtimoli","All models — Dropout · Enrolled · Graduate probability"),
                     barmode="group", height=360,
                     legend=dict(font=dict(color="#A78BFA")),
                     yaxis_tickformat=".0%", yaxis_range=[0, 1.15])
@@ -1276,14 +1325,16 @@ elif "Predict" in page and "Batch" not in page:
                 for r in all_results:
                     votes[r["label"]] = votes.get(r["label"], 0) + 1
                 winner = max(votes, key=votes.get)
+                _vote_word = t("ovoz","votes")
                 vote_html = " &nbsp;·&nbsp; ".join(
-                    [f"<b style='color:{CCOL[c]}'>{c}: {v} ovoz</b>" for c, v in sorted(votes.items(), key=lambda x: -x[1])]
+                    [f"<b style='color:{CCOL[c]}'>{c}: {v} {_vote_word}</b>" for c, v in sorted(votes.items(), key=lambda x: -x[1])]
                 )
+                _vote_hdr = t("🗳️ UMUMIY OVOZ NATIJASI","🗳️ OVERALL VOTE RESULT")
                 st.markdown(
                     f"<div style='text-align:center;padding:14px;background:rgba(0,212,255,.04);"
                     f"border:1px solid rgba(0,212,255,.16);border-radius:12px;margin-top:8px;'>"
                     f"<div style='font-size:.72rem;color:#64748B;letter-spacing:.1em;text-transform:uppercase;"
-                    f"font-family:JetBrains Mono,monospace;margin-bottom:6px;'>🗳️ UMUMIY OVOZ NATIJASI</div>"
+                    f"font-family:JetBrains Mono,monospace;margin-bottom:6px;'>{_vote_hdr}</div>"
                     f"<div style='font-size:.95rem;'>{vote_html}</div>"
                     f"</div>", unsafe_allow_html=True)
 
@@ -1296,32 +1347,32 @@ elif "Predict" in page and "Batch" not in page:
 # ════════════════════════════════════════════════════
 #  5 · BATCH PREDICT
 # ════════════════════════════════════════════════════
-elif "Batch" in page:
-    st.markdown("""
+elif "Batch" in page or "Ommaviy" in page:
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
-      <div class="eyebrow">📤 Ommaviy Bashorat</div>
+      <div class="eyebrow">📤 {"Batch Prediction" if EN() else "Ommaviy Bashorat"}</div>
       <div class="htitle">Batch Prediction</div>
-      <div class="hsub">CSV faylni yuklang — barcha talabalar uchun bir vaqtda bashorat</div>
+      <div class="hsub">{"Upload CSV — predict all students at once" if EN() else "CSV faylni yuklang — barcha talabalar uchun bir vaqtda bashorat"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     sel_m = st.selectbox("🤖 Model:", MODELS, key="batch_model")
     model = load_mdl(sel_m)
     if not model:
-        st.error("❌ Model topilmadi.")
+        st.error(t("❌ Model topilmadi.","❌ Model not found."))
         st.stop()
 
     df_full = load_df()
     tmpl = df_full.drop(columns=["Target"]).head(5)
-    st.download_button("⬇️  Namuna CSV (shablon) yuklab olish",
+    st.download_button(t("⬇️  Namuna CSV (shablon) yuklab olish","⬇️  Download sample CSV (template)"),
         data=to_csv(tmpl), file_name="template.csv", mime="text/csv",
         use_container_width=True, key="batch_tmpl")
 
-    uploaded = st.file_uploader("📂  CSV fayl yuklang:", type=["csv"], key="batch_upload")
+    uploaded = st.file_uploader(t("📂  CSV fayl yuklang:","📂  Upload CSV file:"), type=["csv"], key="batch_upload")
 
     if uploaded is not None:
         try:
             df_up = pd.read_csv(uploaded)
-            st.success(f"✅ Yuklandi: **{df_up.shape[0]}** qator · **{df_up.shape[1]}** ustun")
+            st.success(f"✅ {t('Yuklandi','Uploaded')}: **{df_up.shape[0]}** {t('qator','rows')} · **{df_up.shape[1]}** {t('ustun','cols')}")
 
             # ── CSV ustunlarini tekshirish
             required_cols = set(load_df().drop(columns=["Target"]).columns)
@@ -1329,113 +1380,117 @@ elif "Batch" in page:
             missing_cols  = required_cols - uploaded_cols
             extra_cols    = uploaded_cols - required_cols
             if missing_cols:
-                st.error(f"❌ CSV da quyidagi ustunlar yetishmayapti ({len(missing_cols)} ta):\n`{', '.join(sorted(missing_cols))}`")
-                st.info("💡 To'g'ri formatda shablon yuklab olish uchun yuqoridagi tugmani bosing.")
+                st.error(f"❌ {t('CSV da quyidagi ustunlar yetishmayapti','Missing columns in CSV')} ({len(missing_cols)}):\n`{', '.join(sorted(missing_cols))}`")
+                st.info(t("💡 To'g'ri formatda shablon yuklab olish uchun yuqoridagi tugmani bosing.","💡 Click the button above to download a correctly formatted template."))
                 st.stop()
             if extra_cols:
-                st.warning(f"⚠️ Qo'shimcha ustunlar topildi (e'tiborga olinmaydi): `{', '.join(sorted(extra_cols))}`")
+                _extra_msg = t("Qo'shimcha ustunlar topildi (e'tiborga olinmaydi)","Extra columns found (ignored)")
+                st.warning(f"⚠️ {_extra_msg}: `{', '.join(sorted(extra_cols))}`")
                 df_up = df_up[list(required_cols)]
 
-            # Null qiymatlarni tekshirish
             null_count = df_up.isnull().sum().sum()
             if null_count > 0:
-                st.warning(f"⚠️ {null_count} ta bo'sh qiymat topildi — o'rtacha bilan to'ldiriladi.")
+                _null_msg = t("ta bo'sh qiymat topildi — o'rtacha bilan to'ldiriladi.","missing values found — filled with median.")
+                st.warning(f"⚠️ {null_count} {_null_msg}")
                 df_up = df_up.fillna(df_up.median(numeric_only=True))
 
             st.dataframe(df_up.head(8), use_container_width=True)
 
-            if st.button("🚀  Barchasi uchun bashorat", type="primary",
+            if st.button(t("🚀  Barchasi uchun bashorat","🚀  Predict all"), type="primary",
                          use_container_width=True, key="batch_run"):
-                with st.spinner("⏳ Bashorat qilinmoqda..."):
+                with st.spinner(t("⏳ Bashorat qilinmoqda...","⏳ Predicting...")):
                     try:
                         preds, probs = run_predict(model, df_up)
                         df_res = df_up.copy()
-                        df_res["Bashorat"]       = [CLASSES[p] for p in preds]
-                        df_res["Dropout_%"]      = [round(float(p[0])*100,1) for p in probs]
-                        df_res["Enrolled_%"]     = [round(float(p[1])*100,1) for p in probs]
-                        df_res["Graduate_%"]     = [round(float(p[2])*100,1) for p in probs]
+                        _pred_col = t("Bashorat","Prediction")
+                        df_res[_pred_col]    = [CLASSES[p] for p in preds]
+                        df_res["Dropout_%"]  = [round(float(p[0])*100,1) for p in probs]
+                        df_res["Enrolled_%"] = [round(float(p[1])*100,1) for p in probs]
+                        df_res["Graduate_%"] = [round(float(p[2])*100,1) for p in probs]
 
                         cnt = pd.Series([CLASSES[p] for p in preds]).value_counts()
                         mc1,mc2,mc3 = st.columns(3)
-                        mc1.metric("⚠️ Dropout xavfi", int(cnt.get("Dropout",0)))
-                        mc2.metric("📚 O'qishda",       int(cnt.get("Enrolled",0)))
-                        mc3.metric("🎓 Bitiradi",        int(cnt.get("Graduate",0)))
+                        mc1.metric(t("⚠️ Dropout xavfi","⚠️ Dropout risk"), int(cnt.get("Dropout",0)))
+                        mc2.metric(t("📚 O'qishda","📚 Enrolled"),           int(cnt.get("Enrolled",0)))
+                        mc3.metric(t("🎓 Bitiradi","🎓 Will graduate"),       int(cnt.get("Graduate",0)))
 
                         fig = go.Figure(go.Pie(
                             labels=list(cnt.index), values=list(cnt.values),
                             marker=dict(colors=[CCOL[c] for c in cnt.index],
                                         line=dict(color="rgba(0,0,0,.3)",width=2)),
                             hole=.4, textfont=dict(size=13)))
-                        fig.update_layout(**dark_fig(), title="Bashorat taqsimoti", height=360,
+                        fig.update_layout(**dark_fig(), title=t("Bashorat taqsimoti","Prediction distribution"), height=360,
                                           legend=dict(font=dict(color="#A78BFA")))
                         st.plotly_chart(fig, use_container_width=True, key="batch_pie")
 
                         st.dataframe(
-                            df_res[["Bashorat","Dropout_%","Enrolled_%","Graduate_%"]
+                            df_res[[_pred_col,"Dropout_%","Enrolled_%","Graduate_%"]
                                    + list(df_up.columns[:4])].head(60),
                             use_container_width=True)
 
                         st.download_button(
-                            "⬇️  Barcha natijalarni CSV yuklab olish",
+                            t("⬇️  Barcha natijalarni CSV yuklab olish","⬇️  Download all results as CSV"),
                             data=to_csv(df_res),
-                            file_name="batch_natijalar.csv",
+                            file_name="batch_results.csv",
                             mime="text/csv",
                             use_container_width=True,
                             key="batch_dl_csv")
 
                     except Exception as e:
-                        st.error(f"Bashorat xatosi: {e}")
+                        st.error(f"{t('Bashorat xatosi','Prediction error')}: {e}")
                         st.code(traceback.format_exc())
         except Exception as e:
-            st.error(f"Fayl o'qish xatosi: {e}")
+            _ferr = t("Fayl o'qish xatosi","File read error")
+            st.error(f"{_ferr}: {e}")
 
     st.markdown("---")
-    st.markdown("<div class='sh'>📊 Mavjud dataset ustida test</div>", unsafe_allow_html=True)
-    if st.button("🔄  To'liq dataset ustida bashorat qilish", type="secondary",
+    st.markdown(f"<div class='sh'>📊 {t('Mavjud dataset ustida test','Test on existing dataset')}</div>", unsafe_allow_html=True)
+    if st.button(t("🔄  To'liq dataset ustida bashorat qilish","🔄  Predict on full dataset"), type="secondary",
                  use_container_width=True, key="batch_full"):
-        with st.spinner("⏳ Bashorat qilinmoqda..."):
+        with st.spinner(t("⏳ Bashorat qilinmoqda...","⏳ Predicting...")):
             try:
                 p2, pr2 = run_predict(model, df_full.drop(columns=["Target"]))
                 df_t = df_full.copy()
-                df_t["Bashorat"] = [CLASSES[p] for p in p2]
-                acc = (df_t["Target"] == df_t["Bashorat"]).mean()
-                st.success(f"✅ Umumiy aniqlik: **{acc:.2%}** ({int(acc*len(df_t))}/{len(df_t)})")
-                st.dataframe(df_t[["Target","Bashorat"]].head(50), use_container_width=True)
+                _pred_col2 = t("Bashorat","Prediction")
+                df_t[_pred_col2] = [CLASSES[p] for p in p2]
+                acc = (df_t["Target"] == df_t[_pred_col2]).mean()
+                st.success(f"✅ {t('Umumiy aniqlik','Overall accuracy')}: **{acc:.2%}** ({int(acc*len(df_t))}/{len(df_t)})")
+                st.dataframe(df_t[["Target",_pred_col2]].head(50), use_container_width=True)
                 st.download_button(
-                    "⬇️  To'liq natijalar CSV",
-                    data=to_csv(df_t[["Target","Bashorat"]]),
-                    file_name="full_dataset_bashorat.csv",
+                    t("⬇️  To'liq natijalar CSV","⬇️  Full results CSV"),
+                    data=to_csv(df_t[["Target",_pred_col2]]),
+                    file_name="full_dataset_results.csv",
                     mime="text/csv",
                     use_container_width=True,
                     key="batch_full_dl")
             except Exception as e:
-                st.error(f"Xato: {e}")
+                st.error(f"{t('Xato','Error')}: {e}")
                 st.code(traceback.format_exc())
 
 
 # ════════════════════════════════════════════════════
 #  6 · RISK MONITOR
 # ════════════════════════════════════════════════════
-elif "Risk" in page:
-    st.markdown("""
+elif "Risk" in page or "Xavf" in page:
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
-      <div class="eyebrow">📉 Xavf Monitori</div>
+      <div class="eyebrow">📉 {"Risk Monitor" if EN() else "Xavf Monitori"}</div>
       <div class="htitle">Risk Dashboard</div>
-      <div class="hsub">Dropout xavfi bo'lgan talabalarni aniqlash va filtrlash</div>
+      <div class="hsub">{"Identify and filter high-risk dropout students" if EN() else "Dropout xavfi bo'lgan talabalarni aniqlash va filtrlash"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     sel_m = st.selectbox("🤖 Model:", MODELS, key="risk_model")
     model = load_mdl(sel_m)
     if not model:
-        st.error("❌ Model topilmadi.")
+        st.error(t("❌ Model topilmadi.","❌ Model not found."))
         st.stop()
 
     df_full = load_df()
-    with st.spinner("⏳ Barcha talabalar uchun bashorat qilinmoqda..."):
+    with st.spinner(t("⏳ Barcha talabalar uchun bashorat qilinmoqda...","⏳ Predicting for all students...")):
         try:
             preds, probs = run_predict(model, df_full.drop(columns=["Target"]))
         except Exception as e:
-            st.error(f"Bashorat xatosi: {e}")
+            st.error(f"{t('Bashorat xatosi','Prediction error')}: {e}")
             st.stop()
 
     df_r = df_full.copy()
@@ -1443,21 +1498,21 @@ elif "Risk" in page:
     df_r["Dropout_p"] = [float(p[0]) for p in probs]
     df_r["Togri"]     = df_r["Target"] == df_r["Bashorat"]
 
-    st.markdown("<div class='sh'>🎛️ Filtrlar</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='sh'>🎛️ {t('Filtrlar','Filters')}</div>", unsafe_allow_html=True)
     f1, f2, f3 = st.columns(3)
-    thresh     = f1.slider("Dropout chegara ehtimoli", 0.0, 1.0, 0.5, 0.05, key="risk_thresh")
-    g_sel      = f2.multiselect("Jins", [0,1], default=[0,1], key="risk_gender",
-                                format_func=lambda x:"Ayol" if x==0 else "Erkak")
-    age_rng    = f3.slider("Yosh diapazoni", 17, 70, (17,70), key="risk_age")
+    thresh     = f1.slider(t("Dropout chegara ehtimoli","Dropout threshold probability"), 0.0, 1.0, 0.5, 0.05, key="risk_thresh")
+    g_sel      = f2.multiselect(t("Jins","Gender"), [0,1], default=[0,1], key="risk_gender",
+                                format_func=lambda x: t("Ayol","Female") if x==0 else t("Erkak","Male"))
+    age_rng    = f3.slider(t("Yosh diapazoni","Age range"), 17, 70, (17,70), key="risk_age")
 
     df_f = df_r[df_r["Gender"].isin(g_sel) & df_r["Age at enrollment"].between(*age_rng)]
     high = df_f[df_f["Dropout_p"] >= thresh].sort_values("Dropout_p", ascending=False)
 
     m1,m2,m3,m4 = st.columns(4)
-    m1.metric("🔍 Filtrlangan", len(df_f))
-    m2.metric("⚠️ Yuqori xavf", len(high))
-    m3.metric("📊 Xavf ulushi", f"{len(high)/max(len(df_f),1)*100:.1f}%")
-    m4.metric("✅ Aniqlik", f"{df_f['Togri'].mean():.2%}")
+    m1.metric(t("🔍 Filtrlangan","🔍 Filtered"), len(df_f))
+    m2.metric(t("⚠️ Yuqori xavf","⚠️ High risk"), len(high))
+    m3.metric(t("📊 Xavf ulushi","📊 Risk share"), f"{len(high)/max(len(df_f),1)*100:.1f}%")
+    m4.metric(t("✅ Aniqlik","✅ Accuracy"), f"{df_f['Togri'].mean():.2%}")
 
     try:
         col_a, col_b = st.columns(2)
@@ -1465,9 +1520,9 @@ elif "Risk" in page:
             fig = go.Figure(go.Histogram(x=df_f["Dropout_p"], nbinsx=30,
                 marker=dict(color="#ff2d55", opacity=.8)))
             fig.add_vline(x=thresh, line_color="#ffd200", line_width=2.5,
-                          annotation_text=f"Chegara: {thresh}",
+                          annotation_text=f"{t('Chegara','Threshold')}: {thresh}",
                           annotation_font_color="#ffd200")
-            apply_dark(fig, title="Dropout ehtimoli taqsimoti", height=320)
+            apply_dark(fig, title=t("Dropout ehtimoli taqsimoti","Dropout probability distribution"), height=320)
             st.plotly_chart(fig, use_container_width=True, key="risk_hist")
 
         with col_b:
@@ -1477,7 +1532,7 @@ elif "Risk" in page:
                 marker=dict(colors=[CCOL[c] for c in cnt2.index],
                             line=dict(color="rgba(0,0,0,.3)",width=2)),
                 hole=.4, textfont=dict(size=13)))
-            fig2.update_layout(**dark_fig(), title="Bashorat taqsimoti", height=320,
+            fig2.update_layout(**dark_fig(), title=t("Bashorat taqsimoti","Prediction distribution"), height=320,
                                legend=dict(font=dict(color="#A78BFA")))
             st.plotly_chart(fig2, use_container_width=True, key="risk_pie")
 
@@ -1494,7 +1549,7 @@ elif "Risk" in page:
             text=age_risk["Dropout_ort"].apply(lambda x: f"{x:.2f}"),
             textposition="outside", textfont=dict(color="#fff"),
         ))
-        apply_dark(fig3, title="Yosh guruhlari bo'yicha Dropout ehtimoli",
+        apply_dark(fig3, title=t("Yosh guruhlari bo'yicha Dropout ehtimoli","Dropout probability by age group"),
                    height=320, yaxis_range=[0,1])
         st.plotly_chart(fig3, use_container_width=True, key="risk_age")
 
@@ -1502,14 +1557,14 @@ elif "Risk" in page:
             df_f.sample(min(400, len(df_f)), random_state=42),
             x="Age at enrollment", y="Dropout_p", color="Target",
             color_discrete_map=CCOL, opacity=.65,
-            title="Yosh va Dropout ehtimoli")
+            title=t("Yosh va Dropout ehtimoli","Age vs Dropout probability"))
         fig4.update_layout(**dark_fig(), height=340, legend=dict(font=dict(color="#A78BFA")))
         dark_axes(fig4)
         st.plotly_chart(fig4, use_container_width=True, key="risk_scatter")
     except Exception as e:
         st.error(f"Chart xatosi: {e}")
 
-    st.markdown(f"<div class='sh'>⚠️ Yuqori xavfdagi talabalar — {len(high)} ta</div>",
+    st.markdown(f"<div class='sh'>⚠️ {t('Yuqori xavfdagi talabalar','High-risk students')} — {len(high)}</div>",
                 unsafe_allow_html=True)
     show = [c for c in ["Target","Bashorat","Dropout_p","Gender","Age at enrollment",
             "Scholarship holder","Debtor","Tuition fees up to date",
@@ -1524,11 +1579,11 @@ elif "Risk" in page:
 # ════════════════════════════════════════════════════
 elif "SHAP" in page:
     import pickle as _pkl
-    st.markdown("""
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
       <div class="eyebrow">🔬 XAI — SHAP</div>
-      <div class="htitle">SHAP Tahlili</div>
-      <div class="hsub">Har bir xususiyatning bashoratga ta'sirini tushuntirish — Explainable AI</div>
+      <div class="htitle">{"SHAP Analysis" if EN() else "SHAP Tahlili"}</div>
+      <div class="hsub">{"Explain how each feature impacts predictions — Explainable AI" if EN() else "Har bir xususiyatning bashoratga ta'sirini tushuntirish — Explainable AI"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     SHAP_CACHE = os.path.join(BASE, "reports", "shap_cache.pkl")
@@ -1542,7 +1597,7 @@ elif "SHAP" in page:
     available = [m for m in ["XGBoost","LightGBM","Random Forest","Gradient Boosting"] if m in cache]
 
     if not available:
-        st.warning("⏳ SHAP cache topilmadi. `python precompute_shap.py` ni ishga tushiring.")
+        st.warning(t("⏳ SHAP cache topilmadi. `python precompute_shap.py` ni ishga tushiring.","⏳ SHAP cache not found. Run `python precompute_shap.py`."))
         st.stop()
 
     sel_m = st.selectbox("🤖 Model:", available, key="shap_model")
@@ -1553,7 +1608,8 @@ elif "SHAP" in page:
     n_samples = X_s.shape[0]
 
     # ── 1. Global importance
-    st.markdown("<div class='sh'>🌍 Global xususiyat ta'siri (Top 20)</div>", unsafe_allow_html=True)
+    _shap_g = t("🌍 Global xususiyat ta'siri (Top 20)","🌍 Global feature importance (Top 20)")
+    st.markdown(f"<div class='sh'>{_shap_g}</div>", unsafe_allow_html=True)
     if isinstance(sv, list):
         mean_abs = np.mean(np.abs(np.array(sv)), axis=(0, 1))
     else:
@@ -1574,14 +1630,15 @@ elif "SHAP" in page:
         textposition="outside", textfont=dict(color="#C4B5FD", size=10),
         hovertemplate="%{y}: %{x:.4f}<extra></extra>",
     ))
-    apply_dark(fig, title=f"Top 20 SHAP Global Ta'sir — {sel_m} ({n_samples} namuna)",
+    _shap_title = t(f"Top 20 SHAP Global Ta'sir — {sel_m} ({n_samples} namuna)",f"Top 20 SHAP Global Impact — {sel_m} ({n_samples} samples)")
+    apply_dark(fig, title=_shap_title,
                height=560, yaxis_autorange="reversed")
     st.plotly_chart(fig, use_container_width=True, key="shap_global")
 
     # ── 2. Per-class breakdown
     if isinstance(sv, list) and len(sv) == 3:
-        st.markdown("<div class='sh'>🎯 Sinf bo'yicha xususiyat ta'siri (Top 10)</div>",
-                    unsafe_allow_html=True)
+        _shap_cls = t("🎯 Sinf bo'yicha xususiyat ta'siri (Top 10)","🎯 Per-class feature importance (Top 10)")
+        st.markdown(f"<div class='sh'>{_shap_cls}</div>", unsafe_allow_html=True)
         cls_cols = st.columns(3)
         for ci, (cls_name, col) in enumerate(zip(CLASSES, cls_cols)):
             sv_c = np.mean(np.abs(sv[ci]), axis=0)
@@ -1596,33 +1653,40 @@ elif "SHAP" in page:
                        yaxis_autorange="reversed")
             col.plotly_chart(fig2, use_container_width=True, key=f"shap_cls_{ci}")
 
-    # ── 3. Feature correlation waterfall (top 8)
+    # ── 3. Feature importance table (top 8)
     st.markdown("---")
-    st.markdown("<div class='sh'>📊 Xususiyat muhimlik jadvali</div>", unsafe_allow_html=True)
+    _shap_tbl = t("📊 Xususiyat muhimlik jadvali","📊 Feature importance table")
+    st.markdown(f"<div class='sh'>{_shap_tbl}</div>", unsafe_allow_html=True)
     top8_feats = top_feats[:8]
     top8_vals  = top_vals[:8]
-    df_imp = pd.DataFrame({"Xususiyat": top8_feats, "O'rtacha |SHAP|": top8_vals})
-    df_imp["Ta'sir darajasi"] = pd.cut(top8_vals,
+    _col_feat  = t("Xususiyat","Feature")
+    _col_shap  = t("O'rtacha |SHAP|","Mean |SHAP|")
+    _col_lvl   = t("Ta'sir darajasi","Impact level")
+    _lvls_uz   = ["Past", "O'rta", "Yuqori", "Juda yuqori"]
+    _lvls_en   = ["Low", "Medium", "High", "Very high"]
+    df_imp = pd.DataFrame({_col_feat: top8_feats, _col_shap: top8_vals})
+    df_imp[_col_lvl] = pd.cut(top8_vals,
         bins=[0, 0.05, 0.15, 0.30, 1.0],
-        labels=["Past", "O'rta", "Yuqori", "Juda yuqori"])
-    st.dataframe(df_imp.style.background_gradient(subset=["O'rtacha |SHAP|"], cmap="Reds"),
+        labels=_lvls_en if EN() else _lvls_uz)
+    st.dataframe(df_imp.style.background_gradient(subset=[_col_shap], cmap="Reds"),
                  use_container_width=True, hide_index=True)
 
     # ── 4. Individual student SHAP
     st.markdown("---")
-    st.markdown("<div class='sh'>🔍 Alohida talaba SHAP tahlili</div>", unsafe_allow_html=True)
+    _shap_ind = t("🔍 Alohida talaba SHAP tahlili","🔍 Individual student SHAP analysis")
+    st.markdown(f"<div class='sh'>{_shap_ind}</div>", unsafe_allow_html=True)
 
     model_obj = load_mdl(sel_m)
     if model_obj:
-        idx_s = st.slider("Talaba indeksi (0 – namuna ichidan)", 0, n_samples - 1, 0,
+        idx_s = st.slider(t("Talaba indeksi (0 – namuna ichidan)","Student index (0 – within sample)"), 0, n_samples - 1, 0,
                           key="shap_idx")
         X_row = pd.DataFrame([X_s[idx_s]], columns=feat)
         pred_l = CLASSES[model_obj.predict(X_row)[0]]
         pred_p = model_obj.predict_proba(X_row)[0]
 
         ic1, ic2, ic3 = st.columns(3)
-        ic1.metric("Bashorat", pred_l)
-        ic2.metric("Ishonch", f"{max(pred_p):.1%}")
+        ic1.metric(t("Bashorat","Prediction"), pred_l)
+        ic2.metric(t("Ishonch","Confidence"), f"{max(pred_p):.1%}")
         ic3.metric("Model", sel_m)
 
         pi   = CLASSES.index(pred_l) if isinstance(sv, list) and pred_l in CLASSES else 0
@@ -1637,22 +1701,23 @@ elif "SHAP" in page:
             textposition="outside", textfont=dict(color="#C4B5FD", size=10),
         ))
         fig3.add_vline(x=0, line_color="rgba(139,92,246,.4)", line_width=2)
-        apply_dark(fig3, title=f"Talaba #{idx_s} — '{pred_l}' sinfi uchun SHAP",
+        _shap_ind_title = t(f"Talaba #{idx_s} — '{pred_l}' sinfi uchun SHAP", f"Student #{idx_s} — SHAP for '{pred_l}' class")
+        apply_dark(fig3, title=_shap_ind_title,
                    height=480, yaxis_autorange="reversed")
         st.plotly_chart(fig3, use_container_width=True, key="shap_ind")
 
-    st.success(f"✅ SHAP tahlili tayyor — {sel_m} · {n_samples} namuna asosida")
+    st.success(f"✅ {t('SHAP tahlili tayyor','SHAP analysis complete')} — {sel_m} · {n_samples} {t('namuna asosida','samples')}")
 
 
 # ════════════════════════════════════════════════════
 #  11 · CROSS-VALIDATION
 # ════════════════════════════════════════════════════
 elif "Cross-Validation" in page:
-    st.markdown("""
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
       <div class="eyebrow">📋 Cross-Validation</div>
-      <div class="htitle">CV Natijalari</div>
-      <div class="hsub">5-fold stratified CV — modellarning haqiqiy generalizatsiya qobiliyatini o'lchash</div>
+      <div class="htitle">{"CV Results" if EN() else "CV Natijalari"}</div>
+      <div class="hsub">{"5-fold stratified CV — measuring true generalization of models" if EN() else "5-fold stratified CV — modellarning haqiqiy generalizatsiya qobiliyatini o'lchash"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     @st.cache_data
@@ -1663,10 +1728,9 @@ elif "Cross-Validation" in page:
 
     cv = load_cv()
     if not cv:
-        st.warning("⚠️ CV natijalari topilmadi.")
+        st.warning(t("⚠️ CV natijalari topilmadi.","⚠️ CV results not found."))
         st.stop()
 
-    # Summary metrics
     valid_cv = {k:v for k,v in cv.items() if v.get("mean") and not pd.isna(v["mean"])}
     df_cv = pd.DataFrame([
         {"Model": k, "CV Mean": v["mean"], "Std": v["std"],
@@ -1676,9 +1740,9 @@ elif "Cross-Validation" in page:
 
     best_cv = df_cv.iloc[0]
     c1,c2,c3 = st.columns(3)
-    c1.metric("🥇 Eng yaxshi CV", best_cv["Model"])
+    c1.metric(t("🥇 Eng yaxshi CV","🥇 Best CV"), best_cv["Model"])
     c2.metric("📊 CV Mean", f"{best_cv['CV Mean']:.4f}")
-    c3.metric("📉 Std (barqarorlik)", f"±{best_cv['Std']:.4f}")
+    c3.metric(t("📉 Std (barqarorlik)","📉 Std (stability)"), f"±{best_cv['Std']:.4f}")
 
     # Bar chart with error bars
     try:
@@ -1711,13 +1775,13 @@ elif "Cross-Validation" in page:
                     line_color=clrs[i % len(clrs)],
                     boxmean=True,
                 ))
-        apply_dark(fig2, title="CV fold natijalari taqsimoti (5 fold)", height=400)
+        apply_dark(fig2, title=t("CV fold natijalari taqsimoti (5 fold)","CV fold results distribution (5 fold)"), height=400)
         st.plotly_chart(fig2, use_container_width=True, key="cv_box")
     except Exception as e:
         st.error(f"{e}")
 
-    # Table
-    st.markdown("<div class='sh'>📋 To'liq CV jadvali</div>", unsafe_allow_html=True)
+    _cv_tbl = t("To'liq CV jadvali","Full CV table")
+    st.markdown(f"<div class='sh'>📋 {_cv_tbl}</div>", unsafe_allow_html=True)
     st.dataframe(
         df_cv.style.format({c:"{:.4f}" for c in ["CV Mean","Std","Min","Max"]})
         .background_gradient(subset=["CV Mean"], cmap="Greens")
@@ -1725,9 +1789,20 @@ elif "Cross-Validation" in page:
         use_container_width=True)
 
 
-    # What is CV?
-    with st.expander("ℹ️ Cross-Validation nima?"):
-        st.markdown("""
+    with st.expander(t("ℹ️ Cross-Validation nima?","ℹ️ What is Cross-Validation?")):
+        if EN():
+            st.markdown("""
+        **5-Fold Stratified Cross-Validation** process:
+
+        1. Train set is split into 5 equal folds (stratified — class ratio preserved)
+        2. Each iteration uses 4 folds for training, 1 fold for validation
+        3. 5 accuracy scores are collected and averaged
+        4. This gives a more reliable estimate than simple test-set accuracy
+
+        **Std (standard deviation)** small = stable model, large = unstable.
+        """)
+        else:
+            st.markdown("""
         **5-Fold Stratified Cross-Validation** ishlash tartibi:
 
         1. Train set 5 ta teng qismga bo'linadi (stratified — sinf nisbati saqlanadi)
@@ -1742,12 +1817,12 @@ elif "Cross-Validation" in page:
 # ════════════════════════════════════════════════════
 #  13 · HISOBOT (HTML REPORT)
 # ════════════════════════════════════════════════════
-elif "Hisobot" in page:
-    st.markdown("""
+elif "Hisobot" in page or "Report" in page:
+    st.markdown(f"""
     <div class="hero"><div class="hero-content">
-      <div class="eyebrow">📄 Avtomatik Hisobot</div>
-      <div class="htitle">Hisobot Generatsiya</div>
-      <div class="hsub">Loyiha natijalarini HTML yoki JSON formatda yuklab oling</div>
+      <div class="eyebrow">📄 {"Auto Report" if EN() else "Avtomatik Hisobot"}</div>
+      <div class="htitle">{"Report Generation" if EN() else "Hisobot Generatsiya"}</div>
+      <div class="hsub">{"Download project results in HTML or JSON format" if EN() else "Loyiha natijalarini HTML yoki JSON formatda yuklab oling"}</div>
     </div></div>""", unsafe_allow_html=True)
 
     res  = load_res()
@@ -1762,7 +1837,7 @@ elif "Hisobot" in page:
     cv_data = load_cv_rep()
 
     if not res:
-        st.warning("⚠️ Hisobot ma'lumotlari topilmadi.")
+        st.warning(t("⚠️ Hisobot ma'lumotlari topilmadi.","⚠️ Report data not found."))
         st.stop()
 
     rows = [{"Model":n,"Accuracy":m.get("accuracy",0),"F1":m.get("f1",0),
@@ -1771,13 +1846,13 @@ elif "Hisobot" in page:
     df_r = pd.DataFrame(rows).sort_values("Accuracy", ascending=False).reset_index(drop=True)
     best = df_r.iloc[0]
 
-    # Preview
-    st.markdown("<div class='sh'>👁️ Hisobot ko'rinishi</div>", unsafe_allow_html=True)
+    _rep_prev = t("Hisobot ko'rinishi","Report preview")
+    st.markdown(f"<div class='sh'>👁️ {_rep_prev}</div>", unsafe_allow_html=True)
     p1,p2,p3,p4 = st.columns(4)
-    p1.metric("Jami talabalar", f"{len(df):,}")
-    p2.metric("Eng yaxshi model", best["Model"])
-    p3.metric("Eng yuqori Accuracy", f"{best['Accuracy']:.2%}")
-    p4.metric("Tahlil qilingan modellar", len(res))
+    p1.metric(t("Jami talabalar","Total students"), f"{len(df):,}")
+    p2.metric(t("Eng yaxshi model","Best model"), best["Model"])
+    p3.metric(t("Eng yuqori Accuracy","Top Accuracy"), f"{best['Accuracy']:.2%}")
+    p4.metric(t("Tahlil qilingan modellar","Models analyzed"), len(res))
 
     st.markdown("---")
 
@@ -1915,26 +1990,26 @@ elif "Hisobot" in page:
 
     col1, col2, col3 = st.columns(3)
 
-    if col1.button("🔨  HTML Hisobot yaratish", type="primary",
+    if col1.button(t("🔨  HTML Hisobot yaratish","🔨  Generate HTML Report"), type="primary",
                    use_container_width=True, key="rep_gen"):
-        with st.spinner("⏳ Hisobot yaratilmoqda..."):
+        with st.spinner(t("⏳ Hisobot yaratilmoqda...","⏳ Generating report...")):
             try:
                 html_bytes = build_html_report()
-                st.success(f"✅ Hisobot tayyor! ({len(html_bytes)//1024} KB)")
+                st.success(f"✅ {t('Hisobot tayyor!','Report ready!')} ({len(html_bytes)//1024} KB)")
                 st.download_button(
-                    "⬇️  HTML hisobotni yuklab olish",
+                    t("⬇️  HTML hisobotni yuklab olish","⬇️  Download HTML report"),
                     data=html_bytes,
-                    file_name="edupredict_hisobot.html",
+                    file_name="edupredict_report.html",
                     mime="text/html",
                     use_container_width=True,
                     key="rep_dl_html")
-                st.info("💡 HTML faylni brauzerda oching va **Ctrl+P** → 'PDF sifatida saqlash' orqali PDF qiling.")
+                st.info(t("💡 HTML faylni brauzerda oching va **Ctrl+P** → 'PDF sifatida saqlash' orqali PDF qiling.","💡 Open the HTML file in a browser and press **Ctrl+P** → 'Save as PDF'."))
             except Exception as e:
-                st.error(f"Xato: {e}")
+                st.error(f"{t('Xato','Error')}: {e}")
                 st.code(traceback.format_exc())
 
     col2.download_button(
-        "⬇️  JSON yuklab olish",
+        t("⬇️  JSON yuklab olish","⬇️  Download JSON"),
         data=json.dumps(res, indent=2, ensure_ascii=False).encode("utf-8"),
         file_name="model_results.json",
         mime="application/json",
@@ -1942,22 +2017,23 @@ elif "Hisobot" in page:
         key="rep_dl_json")
 
     col3.download_button(
-        "⬇️  CSV jadval yuklab olish",
+        t("⬇️  CSV jadval yuklab olish","⬇️  Download CSV table"),
         data=to_csv(df_r),
         file_name="model_comparison.csv",
         mime="text/csv",
         use_container_width=True,
         key="rep_dl_csv")
 
-
     st.markdown("---")
-    st.markdown("<div class='sh'>📊 Hisobot tarkibi</div>", unsafe_allow_html=True)
+    _rep_cont = t("Hisobot tarkibi","Report contents")
+    st.markdown(f"<div class='sh'>📊 {_rep_cont}</div>", unsafe_allow_html=True)
+    _n_figs = len([f for f in os.listdir(FIGURES_DIR) if f.endswith(".png")]) if os.path.exists(FIGURES_DIR) else 0
     items = [
-        ("✅","Dataset umumiy statistika","4,424 talaba, 36 xususiyat, 3 sinf"),
-        ("✅","Barcha model natijalari",f"{len(res)} model — Accuracy, F1, Precision, Recall, AUC"),
-        ("✅","Cross-Validation natijalari","5-fold CV mean ± std"),
-        ("✅","Vizualizatsiya grafiklar",f"{len([f for f in os.listdir(FIGURES_DIR) if f.endswith('.png')]) if os.path.exists(FIGURES_DIR) else 0} ta PNG grafik"),
-        ("✅","Eng yaxshi model tafsiloti",f"{best['Model']} — {best['Accuracy']:.2%} accuracy"),
+        ("✅", t("Dataset umumiy statistika","Dataset overview"),        t(f"4,424 talaba, 36 xususiyat, 3 sinf",f"4,424 students, 36 features, 3 classes")),
+        ("✅", t("Barcha model natijalari","All model results"),          f"{len(res)} model — Accuracy, F1, Precision, Recall, AUC"),
+        ("✅", t("Cross-Validation natijalari","Cross-Validation results"), "5-fold CV mean ± std"),
+        ("✅", t("Vizualizatsiya grafiklar","Visualization charts"),      f"{_n_figs} {t('ta PNG grafik','PNG charts')}"),
+        ("✅", t("Eng yaxshi model tafsiloti","Best model detail"),       f"{best['Model']} — {best['Accuracy']:.2%} accuracy"),
     ]
     for ico, title, desc in items:
         st.markdown(
