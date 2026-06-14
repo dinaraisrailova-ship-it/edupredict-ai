@@ -5,27 +5,30 @@ color 0B
 echo.
 echo  ================================================
 echo   EduPredict AI -- Internet orqali ulash
+echo   Telefon + Noutbuk + Har qanday Wi-Fi
 echo  ================================================
 echo.
 
-:: Streamlit ishga tushirish (agar ishlamayotgan bo'lsa)
-echo  [1/2] Streamlit ishga tushirilmoqda...
-start "EduPredict Streamlit" /MIN cmd /c "cd /d %~dp0 && python -m streamlit run app.py --server.address 0.0.0.0 --server.port 8501 --server.enableCORS false --server.enableXsrfProtection false --server.headless true"
+:: Eski jarayonlarni to'xtatish
+taskkill /F /IM cloudflared.exe >nul 2>&1
 
-:: 8 soniya kutish
-echo  Yuklanmoqda, kuting...
-timeout /t 8 /nobreak >nul
+:: Streamlit ishga tushirish
+echo  [1/2] Streamlit ishga tushirilmoqda (port 8502)...
+start "EduPredict Streamlit" /MIN cmd /c "cd /d %~dp0 && python -m streamlit run app.py"
+echo  Yuklanmoqda...
+timeout /t 12 /nobreak >nul
 
-:: Cloudflare Tunnel ochish
+:: Cloudflare Tunnel
 echo  [2/2] Internet tunnel ochilmoqda...
 echo.
-echo  Quyidagi URLni boshqa noutbukda brauzerga kiriting:
-echo  (URL bir necha soniyadan so'ng chiqadi)
+echo  Quyida ko'rinadigan https:// manzilni
+echo  telefon yoki boshqa noutbukda brauzerga kiriting:
 echo.
 echo  ================================================
+echo.
 
-"%~dp0..\cloudflared.exe" tunnel --url http://localhost:8501
+"%~dp0..\cloudflared.exe" tunnel --url http://localhost:8502
 
 echo.
-echo  Tunnel yopildi.
+echo  Tunnel yopildi. Oyna yoping.
 pause
