@@ -1,0 +1,107 @@
+name: EduPredict AI - 24/7 Server
+
+on:
+  schedule:
+    - cron: '0 */5 * * *'   # Har 5 soatda qayta ishga tushadi
+  workflow_dispatch:          # Qo'lda ham ishga tushirish mumkin
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  serve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    steps:
+      - name: Repo yuklab olish
+        uses: actions/checkout@v4
+
+      - name: Python sozlash
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Paketlar o'rnatish
+        run: |
+          pip install --upgrade pip
+          pip install streamlit pandas numpy scikit-learn xgboost lightgbm \
+                      matplotlib seaborn imbalanced-learn joblib ucimlrepo \
+                      shap plotly scipy huggingface_hub
+          echo "MPLBACKEND=Agg" >> $GITHUB_ENV
+
+      - name: Cloudflared yuklab olish
+        run: |
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
+          chmod +x cloudflared
+
+      - name: Streamlit ishga tushirish
+        run: |
+          nohup streamlit run app.py \
+            --server.port 8502 \
+            --server.headless true \
+            --server.enableCORS false \
+            --server.enableXsrfProtection false \
+            --server.address 0.0.0.0 > streamlit.log 2>&1 &
+          echo "Streamlit ishga tushdi"
+          sleep 20
+
+      - name: Tunnel ishga tushirish va URL olish
+        run: |
+          nohup ./cloudflared tunnel --protocol http2 --url http://localhost:8502 > tunnel.log 2>&1 &
+          sleep 25
+          URL=$(grep -o 'https://[^[:space:]]*\.trycloudflare\.com' tunnel.log | head -1)
+          echo "TUNNEL_URL=$URL" >> $GITHUB_ENV
+          echo "URL: $URL"
+
+      - name: GitHub Pages yangilash
+        run: |
+          URL=${{ env.TUNNEL_URL }}
+          cat > docs/index.html << HTMLEOF
+          <!DOCTYPE html>
+          <html lang="uz">
+          <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>EduPredict AI - 24/7 Online</title>
+          <meta http-equiv="refresh" content="2;url=$URL">
+          <style>
+          *{margin:0;padding:0;box-sizing:border-box}
+          body{background:#010610;color:#E2E8F0;font-family:'Courier New',monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center}
+          h1{color:#00D4FF;font-size:2.5rem;text-shadow:0 0 20px #00D4FF;margin-bottom:15px}
+          p{color:#94A3B8;margin-bottom:25px;font-size:1.1rem}
+          .btn{display:inline-block;padding:18px 45px;background:linear-gradient(135deg,#00D4FF,#7C3AED);color:white;text-decoration:none;border-radius:8px;font-size:1.3rem;font-weight:bold;animation:glow 2s ease-in-out infinite alternate}
+          @keyframes glow{from{box-shadow:0 0 10px #00D4FF}to{box-shadow:0 0 30px #7C3AED,0 0 60px #00D4FF}}
+          .on{margin-top:15px;color:#22C55E;font-size:1rem}
+          .url{margin-top:15px;color:#00D4FF;font-size:.85rem;word-break:break-all}
+          </style>
+          </head>
+          <body>
+          <div>
+          <h1>EduPredict AI</h1>
+          <p>AI bilan talabalar tahlili<br>2 soniyada ochilmoqda...</p>
+          <a class="btn" href="$URL">Ilovani Ochish</a>
+          <div class="on">ONLINE 24/7</div>
+          <div class="url">$URL</div>
+          </div>
+          <script>setTimeout(()=>location.href="$URL",2000)</script>
+          </body>
+          </html>
+          HTMLEOF
+
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add docs/index.html
+          git commit -m "Live: $URL [skip ci]" || echo "O'zgarish yo'q"
+          git push
+
+      - name: Server ishlayapti - 5 soat kutish
+        run: |
+          echo "Server ishlayapti: ${{ env.TUNNEL_URL }}"
+          echo "5 soat 30 daqiqa ishlaydi..."
+          sleep 18000
+          echo "Ish tugadi, yangi sessiya boshlanadi"
