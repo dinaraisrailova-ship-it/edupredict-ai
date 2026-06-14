@@ -1,0 +1,65 @@
+{
+  "Logistic Regression": {
+    "accuracy": 0.729944,
+    "f1": 0.742567,
+    "precision": 0.765598,
+    "recall": 0.729944,
+    "auc": 0.892438
+  },
+  "Random Forest": {
+    "accuracy": 0.745763,
+    "f1": 0.751179,
+    "precision": 0.761615,
+    "recall": 0.745763,
+    "auc": 0.903603
+  },
+  "Gradient Boosting": {
+    "accuracy": 0.751412,
+    "f1": 0.751387,
+    "precision": 0.752858,
+    "recall": 0.751412,
+    "auc": 0.900747
+  },
+  "XGBoost": {
+    "accuracy": 0.778531,
+    "f1": 0.776844,
+    "precision": 0.776981,
+    "recall": 0.778531,
+    "auc": 0.905353
+  },
+  "LightGBM": {
+    "accuracy": 0.769492,
+    "f1": 0.767293,
+    "precision": 0.766998,
+    "recall": 0.769492,
+    "auc": 0.900656
+  },
+  "SVM": {
+    "accuracy": 0.720904,
+    "f1": 0.730365,
+    "precision": 0.748308,
+    "recall": 0.720904,
+    "auc": 0.885557
+  },
+  "KNN": {
+    "accuracy": 0.620339,
+    "f1": 0.645998,
+    "precision": 0.703434,
+    "recall": 0.620339,
+    "auc": 0.818847
+  },
+  "Neural Network": {
+    "accuracy": 0.712994,
+    "f1": 0.713087,
+    "precision": 0.713454,
+    "recall": 0.712994,
+    "auc": 0.854112
+  },
+  "Ensemble": {
+    "accuracy": 0.772881,
+    "f1": 0.772294,
+    "precision": 0.773571,
+    "recall": 0.772881,
+    "auc": 0.908787
+  }
+}

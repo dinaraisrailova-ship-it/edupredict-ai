@@ -1,0 +1,14 @@
+streamlit>=1.40.0
+pandas
+numpy
+scikit-learn
+xgboost
+lightgbm
+matplotlib
+seaborn
+imbalanced-learn
+joblib
+ucimlrepo
+shap
+plotly
+scipy
