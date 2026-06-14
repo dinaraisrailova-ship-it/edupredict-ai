@@ -574,8 +574,7 @@ with st.sidebar:
          "📉  Risk Monitor",
          "🔬  SHAP Analysis",
          "📋  Cross-Validation",
-         "📄  Hisobot",
-         "ℹ️  About / Loyiha"],
+         "📄  Hisobot"],
         label_visibility="collapsed",
     )
 
