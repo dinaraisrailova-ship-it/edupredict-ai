@@ -27,7 +27,7 @@ REPORT_PATH = os.path.join(BASE, "reports", "model_results.json")
 
 # ══════════════════════════════════════ LANGUAGE
 if "lang" not in st.session_state:
-    st.session_state.lang = "UZ"
+    st.session_state.lang = "EN"
 
 def EN():
     return st.session_state.lang == "EN"
