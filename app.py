@@ -575,7 +575,7 @@ with st.sidebar:
          "🔬  SHAP Analysis",
          "📋  Cross-Validation",
          "📄  Hisobot",
-         "ℹ️  Loyiha Haqida"],
+         "ℹ️  About / Loyiha"],
         label_visibility="collapsed",
     )
 
@@ -1974,41 +1974,55 @@ elif "Hisobot" in page:
 # ════════════════════════════════════════════════════
 #  14 · LOYIHA HAQIDA
 # ════════════════════════════════════════════════════
-elif "Loyiha Haqida" in page:
+elif "About" in page or "Loyiha" in page:
     st.markdown("""
     <div class="hero"><div class="hero-content">
-      <div class="eyebrow">ℹ️ Diplom Loyihasi 2026</div>
-      <div class="htitle">Loyiha Haqida</div>
-      <div class="hsub">Machine Learning yordamida talabalar natijasini bashorat qilish tizimi — metodologiya, texnologiyalar va arxitektura</div>
+      <div class="eyebrow">DIPLOMA PROJECT · DIPLOM LOYIHASI · 2026</div>
+      <div class="htitle">EduPredict <span style="color:#7C3AED;">AI</span></div>
+      <div class="hsub">
+        <span style="color:#00D4FF;">Student Dropout Prediction System</span>
+        <span style="color:#475569;"> · </span>
+        <span style="color:#A78BFA;">Talabalar Natijasini Bashorat Qilish Tizimi</span>
+      </div>
     </div></div>""", unsafe_allow_html=True)
 
-    # ── Maqsad
-    st.markdown("<div class='sh'>🎯 Loyiha Maqsadi</div>", unsafe_allow_html=True)
-    st.markdown("""
-    <div style='background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.15);
-      border-radius:16px;padding:24px;margin-bottom:20px;
-      box-shadow:0 4px 20px rgba(139,92,246,.06);'>
-      <p style='font-size:1.05rem;line-height:1.8;color:#C4B5FD;'>
-        Ushbu diplom loyihasi oliy ta'lim muassasasidagi talabalarning akademik natijalarini —
-        <b style="color:#8B5CF6;">dropout (o'qishni tashlab ketish)</b>,
-        <b style="color:#D97706;">enrolled (o'qishda davom etish)</b> va
-        <b style="color:#16A34A;">graduate (muvaffaqiyatli bitirish)</b> —
+    # ── Language tabs
+    lang = st.radio("", ["🇬🇧  English", "🇺🇿  O'zbek"], horizontal=True, label_visibility="collapsed")
+    EN = "English" in lang
+
+    # ── Goal
+    goal_title = "🎯 Project Goal" if EN else "🎯 Loyiha Maqsadi"
+    goal_text_en = """This diploma project is designed to predict students' academic outcomes —
+        <b style="color:#F87171;">Dropout</b>,
+        <b style="color:#FBBF24;">Enrolled</b>, and
+        <b style="color:#34D399;">Graduate</b> —
+        using Machine Learning algorithms. The system employs 9 different ML models,
+        compares them against each other, and delivers the most accurate prediction possible."""
+    goal_text_uz = """Ushbu diplom loyihasi oliy ta'lim muassasasidagi talabalarning akademik natijalarini —
+        <b style="color:#F87171;">Dropout (o'qishni tashlab ketish)</b>,
+        <b style="color:#FBBF24;">Enrolled (o'qishda davom etish)</b> va
+        <b style="color:#34D399;">Graduate (muvaffaqiyatli bitirish)</b> —
         Machine Learning algoritmlari yordamida oldindan aniqlashga qaratilgan.
-        Tizim 9 ta turli ML model qo'llaydi va ularni o'zaro taqqoslab, eng aniq bashoratni taqdim etadi.
-      </p>
+        Tizim 9 ta turli ML model qo'llaydi va ularni o'zaro taqqoslab, eng aniq bashoratni taqdim etadi."""
+    st.markdown(f"<div class='sh'>{goal_title}</div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style='background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);
+      border-left:4px solid #00D4FF;border-radius:16px;padding:24px;margin-bottom:20px;'>
+      <p style='font-size:1.05rem;line-height:1.9;color:#C4B5FD;'>{goal_text_en if EN else goal_text_uz}</p>
     </div>""", unsafe_allow_html=True)
 
     # ── Pipeline
-    st.markdown("<div class='sh'>🔄 ML Pipeline</div>", unsafe_allow_html=True)
+    pipeline_title = "🔄 ML Pipeline" if EN else "🔄 ML Bosqichlari"
+    st.markdown(f"<div class='sh'>{pipeline_title}</div>", unsafe_allow_html=True)
     steps = [
-        ("1", "📦", "Ma'lumot yuklash", "UCI Dataset ID:697 · 4,424 talaba · 36 xususiyat", "#7828ff"),
-        ("2", "🔧", "Preprocessing", "Ustun tozalash · Label Encoding · Feature Engineering (+7 yangi xususiyat)", "#0ea5e9"),
-        ("3", "⚖️", "SMOTE Balans", "Sinf nomutanosibligi bartaraf · oversampling · 3 sinf tenglashtirish", "#00c853"),
-        ("4", "✂️", "Train/Test Split", "80% train · 20% test · Stratified sampling", "#ff9f00"),
-        ("5", "🤖", "Model O'qitish", "9 ta ML algoritm parallel o'qitish · Hyperparameter tuning", "#ff2d55"),
-        ("6", "📊", "Baholash", "Accuracy · F1 · Precision · Recall · ROC-AUC · 5-Fold CV", "#e0aaff"),
-        ("7", "🔬", "SHAP Tahlil", "Explainable AI · xususiyat ta'siri · global va lokal tushuntirish", "#7af5ff"),
-        ("8", "🎯", "Bashorat", "Yangi talaba ma'lumotlari → real vaqt bashorat", "#ffd060"),
+        ("1", "📦", "Data Loading" if EN else "Ma'lumot Yuklash",       "UCI ID:697 · 4,424 students · 36 features" if EN else "UCI ID:697 · 4,424 talaba · 36 xususiyat", "#7828ff"),
+        ("2", "🔧", "Preprocessing",                                      "Cleaning · Label Encoding · +7 engineered features" if EN else "Tozalash · Label Encoding · +7 yangi xususiyat", "#0ea5e9"),
+        ("3", "⚖️", "SMOTE Balance" if EN else "SMOTE Balans",           "Class imbalance fix · 3-class oversampling" if EN else "Sinf nomutanosibligi bartaraf · 3 sinf", "#00c853"),
+        ("4", "✂️", "Train/Test Split",                                   "80% train · 20% test · Stratified" , "#ff9f00"),
+        ("5", "🤖", "Model Training" if EN else "Model O'qitish",         "9 ML algorithms · Hyperparameter tuning" if EN else "9 ta ML algoritm · Hyperparameter tuning", "#ff2d55"),
+        ("6", "📊", "Evaluation" if EN else "Baholash",                   "Accuracy · F1 · Precision · Recall · ROC-AUC · 5-CV", "#e0aaff"),
+        ("7", "🔬", "SHAP Analysis" if EN else "SHAP Tahlil",             "Explainable AI · global & local feature impact" if EN else "Explainable AI · xususiyat ta'siri", "#7af5ff"),
+        ("8", "🎯", "Prediction" if EN else "Bashorat",                   "New student data → real-time prediction" if EN else "Yangi talaba → real vaqt bashorat", "#ffd060"),
     ]
     cols2 = st.columns(4)
     for i, (num, ico, title, desc, clr) in enumerate(steps):
@@ -2022,18 +2036,19 @@ elif "Loyiha Haqida" in page:
             f"<div style='font-size:.75rem;color:#475569;line-height:1.5;'>{desc}</div>"
             f"</div>", unsafe_allow_html=True)
 
-    # ── Texnologiyalar
-    st.markdown("<div class='sh'>🛠️ Texnologiyalar</div>", unsafe_allow_html=True)
+    # ── Technologies
+    tech_title = "🛠️ Technologies Used" if EN else "🛠️ Texnologiyalar"
+    st.markdown(f"<div class='sh'>{tech_title}</div>", unsafe_allow_html=True)
     techs = [
-        ("Python 3.x", "Asosiy dasturlash tili", "🐍", "#3776AB"),
-        ("scikit-learn", "ML framework · preprocessing · evaluation", "🔬", "#F7931E"),
-        ("XGBoost", "Gradient boosting · eng yuqori accuracy", "⚡", "#189AB4"),
-        ("LightGBM", "Fast gradient boosting · leaf-wise", "💡", "#00B050"),
-        ("SHAP", "Explainable AI · model tushuntirish", "🔍", "#FF6B6B"),
-        ("SMOTE", "imbalanced-learn · class balancing", "⚖️", "#9B59B6"),
-        ("Streamlit", "Web interfeys · interaktiv dashboard", "🌐", "#FF4B4B"),
-        ("Plotly", "Interaktiv vizualizatsiya", "📊", "#636EFA"),
-        ("Pandas / NumPy", "Ma'lumot tahlili va manipulyatsiya", "🐼", "#150458"),
+        ("Python 3.x",     "Core programming language" if EN else "Asosiy dasturlash tili",                "🐍", "#3776AB"),
+        ("scikit-learn",   "ML framework · preprocessing · evaluation",                                     "🔬", "#F7931E"),
+        ("XGBoost",        "Regularized gradient boosting · top accuracy" if EN else "Eng yuqori accuracy", "⚡", "#189AB4"),
+        ("LightGBM",       "Fast leaf-wise gradient boosting" if EN else "Tez va samarali boosting",        "💡", "#00B050"),
+        ("SHAP",           "Explainable AI · model interpretation" if EN else "Model tushuntirish",         "🔍", "#FF6B6B"),
+        ("SMOTE",          "Synthetic minority oversampling · class balance" if EN else "Sinf balansi",     "⚖️", "#9B59B6"),
+        ("Streamlit",      "Web interface · interactive dashboard" if EN else "Web interfeys · dashboard",  "🌐", "#FF4B4B"),
+        ("Plotly",         "Interactive visualizations" if EN else "Interaktiv vizualizatsiya",             "📊", "#636EFA"),
+        ("Pandas / NumPy", "Data analysis & manipulation" if EN else "Ma'lumot tahlili",                   "🐼", "#150458"),
     ]
     tc = st.columns(3)
     for i, (name, desc, ico, clr) in enumerate(techs):
@@ -2047,14 +2062,15 @@ elif "Loyiha Haqida" in page:
             f"</div>", unsafe_allow_html=True)
 
     # ── Dataset
-    st.markdown("<div class='sh'>📦 Dataset Tafsilotlari</div>", unsafe_allow_html=True)
+    dataset_title = "📦 Dataset Details" if EN else "📦 Dataset Tafsilotlari"
+    st.markdown(f"<div class='sh'>{dataset_title}</div>", unsafe_allow_html=True)
     df_a = load_df()
     a1, a2, a3, a4 = st.columns(4)
     for col, ico, val, lbl in [
-        (a1, "🏛️", "Portekiz", "Mamlakat"),
-        (a2, "📅", "4,424 talaba", "Jami namunalar"),
-        (a3, "🎓", "Polytechnic Institute", "Muassasa"),
-        (a4, "📋", "UCI Repository ID:697", "Manba"),
+        (a1, "🏛️", "Portugal",          "Country" if EN else "Mamlakat"),
+        (a2, "📅", "4,424 students" if EN else "4,424 talaba", "Total samples" if EN else "Jami namunalar"),
+        (a3, "🎓", "Polytechnic Institute", "Institution" if EN else "Muassasa"),
+        (a4, "📋", "UCI Repository ID:697", "Source" if EN else "Manba"),
     ]:
         col.markdown(
             f"<div class='stat'><span class='si'>{ico}</span>"
@@ -2064,15 +2080,28 @@ elif "Loyiha Haqida" in page:
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Feature groups
-    st.markdown("<div class='sh'>📐 Xususiyatlar Guruhlari</div>", unsafe_allow_html=True)
+    fg_title = "📐 Feature Groups" if EN else "📐 Xususiyatlar Guruhlari"
+    st.markdown(f"<div class='sh'>{fg_title}</div>", unsafe_allow_html=True)
     fg_cols = st.columns(3)
     feature_groups_info = [
-        ("👤 Demografik", ["Jins", "Yosh", "Millat", "Oilaviy holat", "Xorijiy", "Ko'chib kelgan", "Maxsus ehtiyoj"], "#7828ff"),
-        ("💰 Ijtimoiy-Iqtisodiy", ["Stipendiya", "To'lov holati", "Qarzdorlik", "Ota-ona ta'limi", "Ota-ona kasbi"], "#0ea5e9"),
-        ("📚 Akademik Fon", ["Kurs", "Ariza usuli", "Qabul bahosi", "Oldingi ta'lim", "Dars vaqti"], "#00c853"),
-        ("📖 1-Semestr", ["Yozilgan", "Baholangan", "O'tilgan", "Baho", "Kreditlar", "Bahosiz"], "#ff9f00"),
-        ("📖 2-Semestr", ["Yozilgan", "Baholangan", "O'tilgan", "Baho", "Kreditlar", "Bahosiz"], "#ff2d55"),
-        ("🌍 Makroiqtisodiy", ["Ishsizlik darajasi", "Inflyatsiya", "YaIM o'sishi"], "#e0aaff"),
+        ("👤 Demographic" if EN else "👤 Demografik",
+         ["Gender","Age","Nationality","Marital status","International","Displaced","Special needs"] if EN else
+         ["Jins","Yosh","Millat","Oilaviy holat","Xorijiy","Ko'chib kelgan","Maxsus ehtiyoj"], "#7828ff"),
+        ("💰 Socioeconomic" if EN else "💰 Ijtimoiy-Iqtisodiy",
+         ["Scholarship","Tuition fees","Debtor","Parent education","Parent occupation"] if EN else
+         ["Stipendiya","To'lov holati","Qarzdorlik","Ota-ona ta'limi","Ota-ona kasbi"], "#0ea5e9"),
+        ("📚 Academic Background" if EN else "📚 Akademik Fon",
+         ["Course","Application mode","Admission grade","Prior qualification","Attendance"] if EN else
+         ["Kurs","Ariza usuli","Qabul bahosi","Oldingi ta'lim","Dars vaqti"], "#00c853"),
+        ("📖 Semester 1" if EN else "📖 1-Semestr",
+         ["Enrolled","Evaluated","Approved","Grade","Credits","Without eval."] if EN else
+         ["Yozilgan","Baholangan","O'tilgan","Baho","Kreditlar","Bahosiz"], "#ff9f00"),
+        ("📖 Semester 2" if EN else "📖 2-Semestr",
+         ["Enrolled","Evaluated","Approved","Grade","Credits","Without eval."] if EN else
+         ["Yozilgan","Baholangan","O'tilgan","Baho","Kreditlar","Bahosiz"], "#ff2d55"),
+        ("🌍 Macroeconomic" if EN else "🌍 Makroiqtisodiy",
+         ["Unemployment rate","Inflation rate","GDP growth"] if EN else
+         ["Ishsizlik darajasi","Inflyatsiya","YaIM o'sishi"], "#e0aaff"),
     ]
     for i, (grp_name, feats, clr) in enumerate(feature_groups_info):
         fg_cols[i % 3].markdown(
@@ -2083,19 +2112,20 @@ elif "Loyiha Haqida" in page:
             + "".join([f"<div style='font-size:.78rem;color:#475569;padding:3px 0;border-bottom:1px solid rgba(139,92,246,.06);'>• {f}</div>" for f in feats])
             + "</div>", unsafe_allow_html=True)
 
-    # ── Modellar
-    st.markdown("<div class='sh'>🤖 Qo'llanilgan ML Modellar</div>", unsafe_allow_html=True)
+    # ── Models
+    models_title = "🤖 ML Models Used" if EN else "🤖 Qo'llanilgan ML Modellar"
+    st.markdown(f"<div class='sh'>{models_title}</div>", unsafe_allow_html=True)
     res_a = load_res()
     models_info = [
-        ("Logistic Regression", "Chiziqli, tezkor, sodda model — baseline", "📉", "Oson talqin etiladi"),
-        ("Random Forest", "200 qaror daraxti, bagging, feature randomness", "🌲", "Yuqori barqarorlik"),
-        ("Gradient Boosting", "Ketma-ket o'qitish, xatoliklarni tuzatish", "📈", "Yaxshi to'ldirishlar"),
-        ("XGBoost", "Regularizatsiyali gradient boosting — champion", "⚡", "Eng yuqori accuracy"),
-        ("LightGBM", "Leaf-wise o'sish, tez va samarali", "💡", "Katta datasetlarda tez"),
-        ("SVM", "Kernel trick, yuqori o'lchamli makon", "🔵", "Chiziqsiz chegaralar"),
-        ("KNN", "K yaqin qo'shni, masofaga asoslangan", "📍", "Oddiy, hisob-intensive"),
-        ("Neural Network", "MLP 256→128→64, ReLU, Adam, Early Stopping", "🧠", "Chuqur o'rganish"),
-        ("Ensemble", "XGBoost+LightGBM+RandomForest Soft Voting", "🗳️", "Eng barqaror natija"),
+        ("Logistic Regression", "Linear baseline · fast · interpretable" if EN else "Chiziqli, tezkor, sodda model", "📉", "Baseline" if EN else "Oson talqin"),
+        ("Random Forest",       "200 trees · bagging · feature randomness" if EN else "200 qaror daraxti, bagging", "🌲", "Stable" if EN else "Barqaror"),
+        ("Gradient Boosting",   "Sequential learning · error correction" if EN else "Ketma-ket o'qitish", "📈", "Robust" if EN else "Mustahkam"),
+        ("XGBoost",             "Regularized gradient boosting · top model" if EN else "Regularizatsiyali boosting", "⚡", "Champion"),
+        ("LightGBM",            "Leaf-wise growth · fast & efficient" if EN else "Leaf-wise, tez va samarali", "💡", "Fast" if EN else "Tez"),
+        ("SVM",                 "Kernel trick · high-dim space" if EN else "Kernel trick, yuqori o'lchamli", "🔵", "Nonlinear" if EN else "Chiziqsiz"),
+        ("KNN",                 "K-nearest neighbors · distance-based" if EN else "K yaqin qo'shni", "📍", "Simple" if EN else "Oddiy"),
+        ("Neural Network",      "MLP 256→128→64 · ReLU · Adam · EarlyStopping", "🧠", "Deep Learning"),
+        ("Ensemble",            "XGBoost+LightGBM+RF Soft Voting" if EN else "Soft Voting birlashmasi", "🗳️", "Most stable" if EN else "Eng barqaror"),
     ]
     mc = st.columns(3)
     for i, (mname, mdesc, mico, mtag) in enumerate(models_info):
@@ -2115,16 +2145,17 @@ elif "Loyiha Haqida" in page:
             f"<span style='font-size:.82rem;font-weight:700;color:#16A34A;'>{acc:.1%}</span></div>"
             f"</div>", unsafe_allow_html=True)
 
-    # ── Metodologiya
-    st.markdown("<div class='sh'>📐 Baholash Metodologiyasi</div>", unsafe_allow_html=True)
+    # ── Methodology
+    method_title = "📐 Evaluation Methodology" if EN else "📐 Baholash Metodologiyasi"
+    st.markdown(f"<div class='sh'>{method_title}</div>", unsafe_allow_html=True)
     mc2 = st.columns(2)
     metrics_explain = [
-        ("🎯 Accuracy", "To'g'ri bashorat qilingan talabalar ulushi", "Asosiy ko'rsatkich"),
-        ("📊 F1 Score", "Precision va Recall harmonik o'rtachasi", "Nomutanosib sinflar uchun"),
-        ("🔵 ROC-AUC", "Receiver Operating Characteristic maydoni", "0.9+ = ajoyib model"),
-        ("📋 5-Fold CV", "Stratified K-Fold cross-validation", "Generalizatsiya qobiliyati"),
-        ("🔬 SHAP", "SHapley Additive exPlanations (XAI)", "Har xususiyat ta'siri"),
-        ("⚖️ SMOTE", "Synthetic Minority Oversampling Technique", "Sinf balansi"),
+        ("🎯 Accuracy",  "Share of correctly predicted students" if EN else "To'g'ri bashorat qilingan talabalar ulushi",   "Main metric" if EN else "Asosiy ko'rsatkich"),
+        ("📊 F1 Score",  "Harmonic mean of Precision & Recall" if EN else "Precision va Recall harmonik o'rtachasi",         "Imbalanced classes" if EN else "Nomutanosib sinflar"),
+        ("🔵 ROC-AUC",   "Area under the ROC curve" if EN else "Receiver Operating Characteristic maydoni",                 "0.9+ = excellent" if EN else "0.9+ = ajoyib"),
+        ("📋 5-Fold CV", "Stratified K-Fold cross-validation" if EN else "Stratified K-Fold cross-validation",              "Generalization" if EN else "Umumlashtirish"),
+        ("🔬 SHAP",      "SHapley Additive exPlanations (XAI)" if EN else "SHapley Additive exPlanations (XAI)",            "Feature impact" if EN else "Xususiyat ta'siri"),
+        ("⚖️ SMOTE",    "Synthetic Minority Oversampling Technique" if EN else "Synthetic Minority Oversampling Technique",  "Class balance" if EN else "Sinf balansi"),
     ]
     for i, (mname, mdesc, mtag) in enumerate(metrics_explain):
         mc2[i % 2].markdown(
@@ -2140,9 +2171,10 @@ elif "Loyiha Haqida" in page:
             f"border:1px solid rgba(139,92,246,.15);'>{mtag}</div>"
             f"</div></div>", unsafe_allow_html=True)
 
-    # ── Natijalar xulosasi
+    # ── Results
     if res_a:
-        st.markdown("<div class='sh'>🏆 Eng Yaxshi Natijalar Xulosasi</div>", unsafe_allow_html=True)
+        results_title = "🏆 Best Results Summary" if EN else "🏆 Eng Yaxshi Natijalar Xulosasi"
+        st.markdown(f"<div class='sh'>{results_title}</div>", unsafe_allow_html=True)
         rows_a = [{"Model":n,"Accuracy":m.get("accuracy",0),"F1":m.get("f1",0),
                    "Precision":m.get("precision",0),"Recall":m.get("recall",0),
                    "ROC-AUC":m.get("auc") or 0} for n,m in res_a.items()]
@@ -2151,9 +2183,9 @@ elif "Loyiha Haqida" in page:
 
         ab1, ab2, ab3, ab4 = st.columns(4)
         ab1.metric("🥇 Champion", best_a["Model"])
-        ab2.metric("🎯 Max Accuracy", f"{best_a['Accuracy']:.2%}")
-        ab3.metric("📊 Max F1", f"{best_a['F1']:.4f}")
-        ab4.metric("🔵 Max AUC", f"{best_a['ROC-AUC']:.4f}")
+        ab2.metric("🎯 Accuracy", f"{best_a['Accuracy']:.2%}")
+        ab3.metric("📊 F1 Score", f"{best_a['F1']:.4f}")
+        ab4.metric("🔵 ROC-AUC", f"{best_a['ROC-AUC']:.4f}")
 
         try:
             fig_a = go.Figure()
@@ -2163,26 +2195,40 @@ elif "Loyiha Haqida" in page:
             fig_a.add_trace(go.Bar(name="ROC-AUC", x=df_a2["Model"], y=df_a2["ROC-AUC"],
                 marker_color="#0ea5e9", text=df_a2["ROC-AUC"].apply(lambda x:f"{x:.3f}"),
                 textposition="outside", textfont=dict(color="#94A3B8")))
-            apply_dark(fig_a, title="Barcha Modellar — Accuracy vs ROC-AUC",
+            apply_dark(fig_a, title="All Models — Accuracy vs ROC-AUC" if EN else "Barcha Modellar — Accuracy vs ROC-AUC",
                        barmode="group", height=380, legend=dict(font=dict(color="#A78BFA")))
             st.plotly_chart(fig_a, use_container_width=True, key="about_chart")
         except Exception as e:
             st.error(f"{e}")
 
     # ── Footer
-    st.markdown("""
-    <div style='text-align:center;margin-top:32px;padding:28px;
-      background:rgba(139,92,246,.07);
-      border:1px solid rgba(139,92,246,.15);border-radius:18px;
-      box-shadow:0 4px 24px rgba(139,92,246,.08);'>
-      <div style='font-size:2rem;margin-bottom:10px;filter:drop-shadow(0 4px 8px rgba(139,92,246,.25));'>🎓</div>
-      <div style='font-family:"Space Grotesk",sans-serif;font-size:1.1rem;font-weight:700;
-        background:linear-gradient(135deg,#6D28D9,#8B5CF6,#A78BFA);
-        -webkit-background-clip:text;-webkit-text-fill-color:transparent;'>
-        EduPredict AI — Diplom Loyihasi 2026
+    footer_line1 = "EduPredict AI — Diploma Project 2026" if EN else "EduPredict AI — Diplom Loyihasi 2026"
+    footer_line2 = "Machine Learning · Explainable AI · Streamlit · Python · UCI Dataset" if EN else "Machine Learning · Tushuntiriluvchi AI · Streamlit · Python · UCI Ma'lumotlari"
+    st.markdown(f"""
+    <div style='text-align:center;margin-top:40px;padding:36px;
+      background:linear-gradient(135deg,rgba(0,212,255,.05),rgba(124,58,237,.07));
+      border:1px solid rgba(0,212,255,.2);border-radius:20px;
+      box-shadow:0 4px 40px rgba(0,212,255,.08);'>
+      <div style='font-size:2.5rem;margin-bottom:12px;
+        filter:drop-shadow(0 0 12px rgba(0,212,255,.5));'>🎓</div>
+      <div style='font-family:"Space Grotesk",sans-serif;font-size:1.25rem;font-weight:800;
+        background:linear-gradient(135deg,#00D4FF,#7C3AED,#A78BFA);
+        -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+        text-shadow:none;letter-spacing:0.02em;'>
+        {footer_line1}
       </div>
-      <div style='color:#64748B;font-size:.82rem;margin-top:8px;'>
-        Machine Learning · XAI · Streamlit · Python · UCI Dataset
+      <div style='color:#475569;font-size:.85rem;margin-top:10px;letter-spacing:0.05em;'>
+        {footer_line2}
+      </div>
+      <div style='margin-top:16px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;'>
+        <span style='background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);
+          color:#00D4FF;border-radius:50px;padding:4px 14px;font-size:.78rem;font-weight:600;'>9 ML Models</span>
+        <span style='background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);
+          color:#A78BFA;border-radius:50px;padding:4px 14px;font-size:.78rem;font-weight:600;'>4,424 Students</span>
+        <span style='background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);
+          color:#22C55E;border-radius:50px;padding:4px 14px;font-size:.78rem;font-weight:600;'>XAI / SHAP</span>
+        <span style='background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);
+          color:#FBBF24;border-radius:50px;padding:4px 14px;font-size:.78rem;font-weight:600;'>UCI Dataset</span>
       </div>
     </div>""", unsafe_allow_html=True)
 
