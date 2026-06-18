@@ -356,6 +356,67 @@ div[data-testid="stVerticalBlock"]{animation:pageFade .28s ease-out both;}
 .ripple{position:absolute;border-radius:50%;background:rgba(0,212,255,.28);transform:scale(0);animation:rippleAnim .52s linear;pointer-events:none;z-index:9999;}
 @keyframes rippleAnim{to{transform:scale(5);opacity:0;}}
 
+/* ── GLITCH TEXT ── */
+.htitle{animation:titleFlow 6s ease-in-out infinite,glitch 9s ease-in-out infinite!important;}
+@keyframes glitch{
+  0%,88%,100%{text-shadow:none;transform:none;}
+  89%{text-shadow:3px 0 #ff003c,-3px 0 #00D4FF;transform:skewX(3deg);}
+  90%{text-shadow:-3px 0 #ff003c,3px 0 #00D4FF;transform:skewX(-3deg);}
+  91%{text-shadow:none;transform:none;}
+  92%{text-shadow:2px 2px #8B5CF6,-2px -2px #00D4FF;transform:skewX(1deg) translateX(3px);}
+  93%{text-shadow:none;transform:none;}
+  94%{text-shadow:-2px 0 #ff003c,2px 0 #00FFFF;transform:skewX(-1deg);}
+  95%{text-shadow:none;transform:none;}
+}
+
+/* ── NEON CURSOR ── */
+#cyber-cursor{
+  position:fixed;pointer-events:none;z-index:99999;
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,255,.9) 0%,rgba(0,212,255,.3) 40%,transparent 70%);
+  box-shadow:0 0 12px rgba(0,212,255,.8),0 0 24px rgba(0,212,255,.4),0 0 48px rgba(0,212,255,.15);
+  transform:translate(-50%,-50%);
+  transition:transform .08s ease,width .15s,height .15s,background .15s;
+  mix-blend-mode:screen;
+}
+#cyber-cursor.clicked{
+  width:32px;height:32px;
+  background:radial-gradient(circle,rgba(139,92,246,.9) 0%,rgba(139,92,246,.3) 40%,transparent 70%);
+  box-shadow:0 0 20px rgba(139,92,246,.9),0 0 40px rgba(139,92,246,.4);
+}
+.cursor-trail{
+  position:fixed;pointer-events:none;z-index:99998;
+  border-radius:50%;transform:translate(-50%,-50%);
+  background:rgba(0,212,255,.25);
+  animation:trailFade .6s ease forwards;
+}
+@keyframes trailFade{to{opacity:0;transform:translate(-50%,-50%) scale(0);}}
+
+/* ── ENHANCED SCANLINES ── */
+.stApp::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);
+  animation:scanMove 8s linear infinite;
+}
+@keyframes scanMove{0%{background-position:0 0}100%{background-position:0 100px}}
+
+/* ── NEON FLICKER ── */
+.eyebrow{animation:eyebrowPulse 3s ease-in-out infinite,neonFlicker 12s ease-in-out infinite!important;}
+@keyframes neonFlicker{
+  0%,96%,100%{opacity:1;}
+  97%{opacity:.7;}
+  98%{opacity:1;}
+  99%{opacity:.5;}
+}
+
+/* ── CARD SCAN LINE ── */
+.stat::before{
+  content:'';position:absolute;top:-100%;left:0;right:0;height:100%;
+  background:linear-gradient(180deg,transparent,rgba(0,212,255,.06),transparent);
+  animation:cardScan 4s ease-in-out infinite;border-radius:16px;
+}
+@keyframes cardScan{0%{top:-100%}100%{top:200%}}
+
 /* ══════════════════════════════════════════
    MOBILE RESPONSIVE — telefon uchun
 ══════════════════════════════════════════ */
@@ -442,6 +503,7 @@ div[data-testid="stVerticalBlock"]{animation:pageFade .28s ease-out both;}
 
 <script>
 (function(){
+  /* ── RIPPLE ── */
   function addRipple(e){
     const btn = e.target.closest('button');
     if(!btn) return;
@@ -454,6 +516,74 @@ div[data-testid="stVerticalBlock"]{animation:pageFade .28s ease-out both;}
     r.addEventListener('animationend',()=>r.remove());
   }
   document.addEventListener('click', addRipple);
+
+  /* ── MATRIX RAIN ── */
+  function initMatrix(){
+    const c = document.createElement('canvas');
+    c.id = 'matrix-rain';
+    c.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:0;opacity:0.045;';
+    document.body.appendChild(c);
+    const ctx = c.getContext('2d');
+    const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+    resize();
+    window.addEventListener('resize', resize);
+    const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノＡＢＣＤＥ∑∂∇∫⌬⊗⊕◈◉▸▹▸▹◈⬡';
+    const fs = 11;
+    let drops = [];
+    const reset = () => { drops = Array(Math.floor(c.width/fs)).fill(0).map(()=>Math.random()*-50); };
+    reset();
+    window.addEventListener('resize', reset);
+    setInterval(() => {
+      ctx.fillStyle = 'rgba(2,8,16,0.06)';
+      ctx.fillRect(0, 0, c.width, c.height);
+      drops.forEach((y, i) => {
+        const bright = Math.random() > 0.97;
+        ctx.fillStyle = bright ? '#ffffff' : (Math.random()>0.5 ? '#00D4FF' : '#8B5CF6');
+        ctx.font = fs + 'px monospace';
+        ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fs, y*fs);
+        if(y*fs > c.height && Math.random() > 0.977) drops[i] = 0;
+        drops[i] += 0.5;
+      });
+    }, 55);
+  }
+
+  /* ── NEON CURSOR TRAIL ── */
+  function initCursor(){
+    const cur = document.createElement('div');
+    cur.id = 'cyber-cursor';
+    document.body.appendChild(cur);
+    let mx = -100, my = -100;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cur.style.left = mx+'px'; cur.style.top = my+'px';
+      const t = document.createElement('div');
+      t.className = 'cursor-trail';
+      const s = 4 + Math.random()*6;
+      t.style.cssText = `left:${mx}px;top:${my}px;width:${s}px;height:${s}px;`;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 600);
+    });
+    document.addEventListener('mousedown', () => cur.classList.add('clicked'));
+    document.addEventListener('mouseup',   () => cur.classList.remove('clicked'));
+  }
+
+  /* ── INIT on DOM ready ── */
+  function init(){
+    initMatrix();
+    initCursor();
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 400);
+  }
+
+  /* re-inject when Streamlit re-renders */
+  const obs = new MutationObserver(() => {
+    if(!document.getElementById('matrix-rain'))  initMatrix();
+    if(!document.getElementById('cyber-cursor')) initCursor();
+  });
+  obs.observe(document.body, {childList:true, subtree:false});
 })();
 </script>
 """, unsafe_allow_html=True)
