@@ -5,3 +5,15 @@ __pycache__/
 *.log
 .DS_Store
 Thumbs.db
+auto_click.py
+auto_tunnel.py
+deploy_auto.py
+deploy_edge.py
+hf_deploy.py
+hf_simple.py
+make_submission.py
+tunnel_log.txt
+current_url.txt
+submission/
+hf_*.png
+s1_*.png
